@@ -90,25 +90,33 @@ def logout():
     session.clear()
     return redirect(url_for('auth.login'))
 
-@bp.route('/auth/signup', methods=['GET','POST'])
-def signup():
-    if g.user:
-        return redirect(url_for('auth.home_for_user'))
+def _signup_form(request):
+    company = request.form.get('company','').strip()
+    full_name = request.form.get('full_name','').strip()
+    username = request.form.get('username','').strip()
+    email = request.form.get('email','').strip()
+    phone = request.form.get('phone','').strip()
+    pw1 = request.form.get('password1','')
+    pw2 = request.form.get('password2','')
+    return dict(company=company, full_name=full_name, username=username,
+                email=email, phone=phone)
+
+
+def _do_signup(render):
     form = {}
     if request.method == 'POST':
-        company = request.form.get('company','').strip()
-        full_name = request.form.get('full_name','').strip()
-        username = request.form.get('username','').strip()
-        email = request.form.get('email','').strip()
-        phone = request.form.get('phone','').strip()
+        form = _signup_form(request)
+        company = form['company']
+        full_name = form['full_name']
+        username = form['username']
+        email = form['email']
+        phone = form['phone']
         pw1 = request.form.get('password1','')
         pw2 = request.form.get('password2','')
-        form = dict(company=company, full_name=full_name, username=username,
-                    email=email, phone=phone)
 
         def fail(msg):
             flash(msg, 'error')
-            return render_template('auth/signup.html', form=form), 400
+            return render('auth/signup.html', form=form), 400
 
         if not company or not full_name or not username or not pw1:
             return fail('All fields are required')
@@ -143,7 +151,22 @@ def signup():
         flash('Welcome to %s. Your company workspace is ready.' % company, 'ok')
         return redirect(url_for('dashboard.index', slug=slug))
 
-    return render_template('auth/signup.html', form=form)
+    return render('auth/signup.html', form=form)
+
+
+@bp.route('/auth/signup', methods=['GET','POST'])
+def signup():
+    if g.user:
+        return redirect(url_for('auth.home_for_user'))
+    return _do_signup(render_template)
+
+
+@bp.route('/join', methods=['GET','POST'])
+def join():
+    """Alias used by the deployed app: register a company and its owner."""
+    if g.user:
+        return redirect(url_for('auth.home_for_user'))
+    return _do_signup(render_template)
 
 @bp.route('/auth/home-for-user')
 def home_for_user():

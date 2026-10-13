@@ -214,6 +214,10 @@ CREATE INDEX IF NOT EXISTS idx_maint_company ON maintenance_records(company_id);
 
 INSERT OR IGNORE INTO plans (code,name,price_cents,trial_days,max_vehicles,max_users,max_trips_per_month,features,sort_order)
 VALUES
-('free','Free',0,0,2,2,-1,'{}',1),
+('free','Free',0,0,2,-1,-1,'{}',1),
 ('standard','Standard',2900,14,25,10,500,'{"pdf_exports":true,"maintenance_scheduling":true}',2),
 ('fleet','Fleet',9900,14,-1,-1,-1,'{"pdf_exports":true,"maintenance_scheduling":true,"gps_tracking":true,"fuel_analytics":true,"api_access":true,"multi_branch":true}',3);
+
+-- Every company gets its own users for free, regardless of when the plan
+-- row was first inserted.
+UPDATE plans SET max_users=-1 WHERE code='free' AND max_users>=0;
