@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit driver' if row else 'Add driver' }} - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>{{ 'Edit driver' if row else 'Add driver' }}</h1><p class="page-sub">{{ g.company.name }}</p></div>
+<div class="panel">
+  <form method="post" class="form-grid" novalidate>
+    <div class="field"><label>Full name *</label><input name="name" required value="{{ row.name if row else '' }}"></div>
+    <div class="field"><label>Phone</label><input name="phone" value="{{ row.phone if row else '' }}" placeholder="e.g. 0712 345 678"></div>
+    <div class="field"><label>Licence number</label><input name="licence_no" value="{{ row.licence_no if row else '' }}"></div>
+    <div class="field"><label>Licence expiry</label><input name="licence_expiry" value="{{ row.licence_expiry if row else '' }}" placeholder="YYYY-MM-DD"></div>
+    <div class="field"><label>Status</label>
+      <label class="check"><input type="checkbox" name="is_active" value="1" {% if not row or row.is_active %}checked{% endif %}> Available for trips</label>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-accent">{{ 'Save changes' if row else 'Add driver' }}</button>
+      <a class="btn" href="{{ url_for('fleet.drivers', slug=g.company.slug) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Reports - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Reports &amp; Exports</h1><p class="page-sub">{{ g.company.name }} &middot; all figures in your plan currency</p></div>
+
+<div class="quick-actions">
+  <a class="btn" href="{{ url_for('export.trips_csv', slug=g.company.slug) }}">Trips CSV</a>
+  <a class="btn" href="{{ url_for('export.fuel_csv', slug=g.company.slug) }}">Fuel CSV</a>
+  <a class="btn" href="{{ url_for('export.vehicles_csv', slug=g.company.slug) }}">Vehicles CSV</a>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-body"><div class="kpi-label">Trips</div><div class="kpi-value">{{ summary.trips }}</div><div class="kpi-hint">{{ summary.completed }} completed</div></div></div>
+  <div class="kpi"><div class="kpi-body"><div class="kpi-label">Revenue</div><div class="kpi-value">{{ '{:,.2f}'.format(summary.revenue_cents / 100) }}</div></div></div>
+  <div class="kpi"><div class="kpi-body"><div class="kpi-label">Cost</div><div class="kpi-value">{{ '{:,.2f}'.format(summary.cost_cents / 100) }}</div></div></div>
+  <div class="kpi"><div class="kpi-body"><div class="kpi-label">Profit</div><div class="kpi-value">{{ '{:,.2f}'.format(summary.profit_cents / 100) }}</div><div class="kpi-hint">fuel {{ '{:,.2f}'.format(summary.fuel_cents / 100) }} &middot; maint {{ '{:,.2f}'.format(summary.maint_cents / 100) }}</div></div></div>
+</div>
+
+<div class="grid-2">
+  <div class="panel">
+    <div class="panel-head"><h2>Trips by status</h2></div>
+    <div class="stat-bars">
+      {% set total = summary.trips or 1 %}
+      {% for s in by_status %}
+      <div class="stat-bar"><span class="s-name">{{ s.status }}</span><div class="track"><div class="fill blue" style="width: {{ (s.c * 100 / total)|round(1) }}%"></div></div><strong>{{ s.c }}</strong></div>
+      {% else %}<p class="empty">No trips recorded.</p>{% endfor %}
+    </div>
+    <div class="panel-head" style="margin-top:18px"><h2>Busiest routes</h2></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Route</th><th class="num">Trips</th><th class="num">Revenue</th></tr></thead>
+      <tbody>{% for r in top_routes %}<tr><td>{{ r.name }}</td><td class="num">{{ r.c }}</td><td class="num">{{ '{:,.2f}'.format(r.s / 100) }}</td></tr>{% else %}<tr><td colspan="3" class="empty">No route data</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><h2>Monthly revenue</h2></div>
+    <div class="stat-bars">
+      {% for m in monthly %}
+      <div class="stat-bar"><span class="s-name">{{ m.m }}</span><div class="track"><div class="fill teal" style="width: 100%"></div></div><strong>{{ '{:,.0f}'.format(m.s / 100) }}</strong></div>
+      {% else %}<p class="empty">No dated trips yet.</p>{% endfor %}
+    </div>
+    <div class="panel-head" style="margin-top:18px"><h2>Operations</h2></div>
+    <div class="table-wrap"><table><tbody>
+      <tr><td>Vehicles</td><td class="num">{{ summary.vehicles }}</td></tr>
+      <tr><td>Active drivers</td><td class="num">{{ summary.drivers }}</td></tr>
+      <tr><td>Routes</td><td class="num">{{ summary.routes }}</td></tr>
+      <tr><td>Bookings</td><td class="num">{{ summary.bookings }}</td></tr>
+      <tr><td>Distance covered (km)</td><td class="num">{{ '{:,.0f}'.format(summary.distance_km) }}</td></tr>
+      <tr><td>Open maintenance</td><td class="num">{{ summary.open_maint }}</td></tr>
+    </tbody></table></div>
+  </div>
+</div>
+{% endblock %}

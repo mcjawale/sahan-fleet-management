@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Drivers - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Drivers</h1><p class="page-sub">{{ rows|length }} driver(s) in {{ g.company.name }}</p></div>
+<div class="quick-actions">
+  <a class="btn btn-accent" href="{{ url_for('fleet.drivers_new', slug=g.company.slug) }}">+ Add Driver</a>
+</div>
+<div class="panel">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Phone</th><th>Licence</th><th>Licence expiry</th><th class="num">Live trips</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td><strong>{{ r.name }}</strong></td>
+          <td>{{ r.phone or '-' }}</td>
+          <td>{{ r.licence_no or '-' }}</td>
+          <td>{{ r.licence_expiry or '-' }}</td>
+          <td class="num">{{ r.live }}</td>
+          <td>{% if r.is_active %}<span class="pill ok">active</span>{% else %}<span class="pill bad">inactive</span>{% endif %}</td>
+          <td class="row-actions">
+            <a class="btn btn-sm" href="{{ url_for('fleet.drivers_edit', slug=g.company.slug, did=r.id) }}">Edit</a>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="empty">No drivers yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

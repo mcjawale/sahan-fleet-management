@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Fuel - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Fuel</h1><p class="page-sub">This month: {{ '{:,.2f}'.format(mtd / 100) }}</p></div>
+<div class="quick-actions">
+  <a class="btn btn-accent" href="{{ url_for('records.fuel_new', slug=g.company.slug) }}">+ Add Fuel Entry</a>
+</div>
+<div class="panel">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Vehicle</th><th>Driver</th><th class="num">Litres</th><th class="num">Amount</th><th class="num">Odometer</th><th>Notes</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for f in rows %}
+        <tr>
+          <td>{{ f.date }}</td>
+          <td>{{ f.plate_no or '-' }}</td>
+          <td>{{ f.dname or '-' }}</td>
+          <td class="num">{{ f.quantity_l or '-' }}</td>
+          <td class="num">{{ '{:,.2f}'.format(f.amount_cents / 100) }}</td>
+          <td class="num">{{ f.odometer if f.odometer is not none else '-' }}</td>
+          <td>{{ f.notes or '-' }}</td>
+          <td class="row-actions">
+            <form method="post" action="{{ url_for('records.fuel_delete', slug=g.company.slug, fid=f.id) }}" class="inline-form">
+              <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Remove this fuel entry?')">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="8" class="empty">No fuel records yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

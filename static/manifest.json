@@ -1,0 +1,21 @@
+{
+  "name": "MCJ Sahan Fleet Management System",
+  "short_name": "MCJ Sahan",
+  "description": "Fleet, trips, fuel and maintenance for MCJ Sahan transport operations.",
+  "start_url": "/m/",
+  "scope": "/m/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1f5f9",
+  "theme_color": "#1d4ed8",
+  "icons": [
+    { "src": "/static/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "New trip", "url": "/m/trips/new" },
+    { "name": "Add vehicle", "url": "/m/vehicles/new" },
+    { "name": "Log fuel", "url": "/m/fuel/new" }
+  ]
+}

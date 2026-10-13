@@ -1,0 +1,24 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'fleet' %}
+{% block title %}Vehicles - {{ g.company.name }}{% endblock %}
+{% block heading %}Vehicles{% endblock %}
+{% block subheading %}{{ rows|length }} in fleet{% endblock %}
+{% block content %}
+<a class="m-fab" href="{{ url_for('mobile.vehicles_new') }}" aria-label="Add vehicle">+</a>
+<div class="m-list">
+  {% for r in rows %}
+  <a class="m-item" href="{{ url_for('mobile.vehicles_edit', vid=r.id) }}">
+    <div class="m-item-main">
+      <strong>{{ r.plate_no }}</strong>
+      <small>{{ [r.make, r.model]|select|join(' ') or 'No make recorded' }} &middot; {{ '{:,}'.format(r.odometer) }} km</small>
+    </div>
+    <div class="m-item-side">
+      <span class="m-tag {{ r.status|replace(' ', '_') }}">{{ r.status }}</span>
+      {% if r.capacity %}<small>{{ r.capacity }} seats</small>{% endif %}
+    </div>
+  </a>
+  {% else %}
+  <div class="m-empty">No vehicles yet.<br><a href="{{ url_for('mobile.vehicles_new') }}">Add your first vehicle</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5">
+<meta name="theme-color" content="#1d4ed8">
+<meta name="description" content="MCJ Sahan Fleet Management System mobile app">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MCJ Sahan">
+<meta name="mobile-web-app-capable" content="yes">
+<title>{% block title %}MCJ Sahan Fleet{% endblock %}</title>
+<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<link rel="icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+{% if g.user and g.company %}
+<div class="m-app">
+  <header class="m-topbar">
+    <button class="m-back" type="button" onclick="history.length > 1 ? history.back() : location.href='{{ url_for('mobile.index') }}'" aria-label="Back">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M15.5 4.5 8 12l7.5 7.5 1.4-1.4L10.8 12l6.1-6.1z"/></svg>
+    </button>
+    <div class="m-topbar-title">
+      <h1>{% block heading %}{{ g.company.name }}{% endblock %}</h1>
+      <p>{% block subheading %}{{ g.user.full_name or g.user.username }}{% endblock %}</p>
+    </div>
+    <a class="m-avatar" href="{{ url_for('mobile.account') }}" aria-label="Account">{{ (g.user.full_name or g.user.username)[:1]|upper }}</a>
+  </header>
+
+  <main class="m-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="m-flashes">
+          {% for cat, msg in messages %}<div class="m-flash {{ cat }}">{{ msg }}</div>{% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <nav class="m-tabbar">
+    <a class="m-tab {% if tab == 'home' %}on{% endif %}" href="{{ url_for('mobile.index') }}">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      <span>Home</span>
+    </a>
+    <a class="m-tab {% if tab == 'fleet' %}on{% endif %}" href="{{ url_for('mobile.vehicles') }}">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M18.9 6l1.1 3.8V18a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1h-8a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9.8L7.1 6a1 1 0 0 1 .9-.6h10a1 1 0 0 1 .9.6z"/></svg>
+      <span>Fleet</span>
+    </a>
+    <a class="m-tab {% if tab == 'trips' %}on{% endif %}" href="{{ url_for('mobile.trips') }}">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/></svg>
+      <span>Trips</span>
+    </a>
+    <a class="m-tab {% if tab == 'records' %}on{% endif %}" href="{{ url_for('mobile.fuel') }}">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M5 3h8a2 2 0 0 1 2 2v7l1.5 1.5A1.5 1.5 0 0 1 17 16v3a1 1 0 0 0 2 0v-6.3a3.5 3.5 0 0 1-1-2.3V8h-1l1-3 1 3h1l-1.5 3.8V19a1 1 0 0 1-4 0v-2.6L13 15V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v7a2 2 0 0 1-2 2v-6.3a3.5 3.5 0 0 0 1 2.3V19h-9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg>
+      <span>Records</span>
+    </a>
+    <a class="m-tab {% if tab == 'more' %}on{% endif %}" href="{{ url_for('mobile.account') }}">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4.4 0-8 2.2-8 5v3h16v-3c0-2.8-3.6-5-8-5z"/></svg>
+      <span>More</span>
+    </a>
+  </nav>
+</div>
+{% else %}
+  {% block anonymous %}{% endblock %}
+{% endif %}
+{% block scripts %}{% endblock %}
+</body>
+</html>

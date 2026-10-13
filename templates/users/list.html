@@ -2,6 +2,73 @@
 {% block title %}Users - {{ g.company.name }}{% endblock %}
 {% block content %}
 <div class="page-head"><h1>Users</h1><p class="page-sub">Manage access for {{ g.company.name }}</p></div>
-<div class="quick-actions"><a class="btn btn-accent" href="{{ url_for('users.new', slug=g.company.slug) }}">+ Add User</a></div>
-<div class="panel"><div class="table-wrap"><table><thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th></tr></thead><tbody>{% for r in rows %}<tr><td>{{ r.username }}</td><td>{{ r.full_name or '-' }}</td><td>{{ r.email or '-' }}</td><td>{{ r.role }}</td><td>{{ 'active' if r.is_active else 'inactive' }}</td><td>{{ r.created_at }}</td></tr>{% else %}<tr><td colspan="6" class="empty">No users</td></tr>{% endfor %}</tbody></table></div></div>
+
+{% if slots is none %}
+  <p class="hint">Your plan has unlimited user accounts.</p>
+{% elif slots > 0 %}
+  <p class="hint">{{ slots }} user slot(s) left on your plan.</p>
+{% else %}
+  <p class="hint">You have reached your plan limit of {{ quota }} active user(s).</p>
+{% endif %}
+
+<div class="quick-actions">
+  {% if slots is none or slots > 0 %}
+  <a class="btn btn-accent" href="{{ url_for('users.new', slug=g.company.slug) }}">+ Add User</a>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last sign-in</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td>{{ r.username }}{% if r.id == g.user_id %} <span class="pill">you</span>{% endif %}</td>
+          <td>{{ r.full_name or '-' }}</td>
+          <td>{{ r.email or '-' }}</td>
+          <td>{{ r.role }}</td>
+          <td>
+            {% if r.is_active %}<span class="pill ok">active</span>
+            {% else %}<span class="pill bad">inactive</span>{% endif %}
+          </td>
+          <td>{{ r.last_login_at or 'never' }}</td>
+          <td class="row-actions">
+            <a class="btn btn-sm" href="{{ url_for('users.edit', slug=g.company.slug, user_id=r.id) }}">Edit</a>
+            <form method="post" action="{{ url_for('users.reset_password', slug=g.company.slug, user_id=r.id) }}" class="inline-form">
+              <input type="hidden" name="password1" value="">
+              <input type="hidden" name="password2" value="">
+              <button class="btn btn-sm" type="submit" onclick="return resetPw(this)">Reset password</button>
+            </form>
+            {% if not r.is_active %}
+            <form method="post" action="{{ url_for('users.unlock', slug=g.company.slug, user_id=r.id) }}" class="inline-form">
+              <button class="btn btn-sm" type="submit">Unlock</button>
+            </form>
+            {% endif %}
+            {% if r.id != g.user_id %}
+            <form method="post" action="{{ url_for('users.delete', slug=g.company.slug, user_id=r.id) }}" class="inline-form">
+              <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Remove {{ r.username }} from this company?')">Remove</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="empty">No users</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function resetPw(form){
+  var pw = window.prompt('New password for this user (min 8 characters)');
+  if (pw === null) { return false; }
+  if (pw.length < 8) { window.alert('Password must be at least 8 characters'); return false; }
+  if (pw !== window.prompt('Confirm new password')) { window.alert('Passwords do not match'); return false; }
+  form.querySelector('input[name=password1]').value = pw;
+  form.querySelector('input[name=password2]').value = pw;
+  return true;
+}
+</script>
 {% endblock %}

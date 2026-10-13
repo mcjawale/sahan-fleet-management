@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit vehicle' if row else 'Add vehicle' }} - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>{{ 'Edit vehicle' if row else 'Add vehicle' }}</h1><p class="page-sub">{{ g.company.name }}</p></div>
+<div class="panel">
+  <form method="post" class="form-grid" novalidate>
+    <div class="field"><label>Plate number *</label><input name="plate_no" required value="{{ row.plate_no if row else '' }}" placeholder="e.g. KDG 482R"></div>
+    <div class="field"><label>Make</label><input name="make" value="{{ row.make if row else '' }}" placeholder="e.g. Toyota"></div>
+    <div class="field"><label>Model</label><input name="model" value="{{ row.model if row else '' }}" placeholder="e.g. Hiace"></div>
+    <div class="field"><label>Year</label><input name="year" type="number" min="1900" max="2100" value="{{ row.year if row and row.year else '' }}"></div>
+    <div class="field"><label>Capacity (seats)</label><input name="capacity" type="number" min="0" max="200" value="{{ row.capacity if row and row.capacity is not none else '' }}"></div>
+    <div class="field"><label>Odometer (km)</label><input name="odometer" type="number" min="0" value="{{ row.odometer if row else 0 }}"></div>
+    <div class="field">
+      <label>Status</label>
+      <select name="status">
+        {% for s in statuses %}<option value="{{ s }}" {% if row and row.status == s %}selected{% elif not row and s == 'available' %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-accent">{{ 'Save changes' if row else 'Add vehicle' }}</button>
+      <a class="btn" href="{{ url_for('fleet.vehicles', slug=g.company.slug) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

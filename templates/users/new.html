@@ -1,14 +1,26 @@
 {% extends 'base.html' %}
-{% block title %}New User - {{ g.company.name }}{% endblock %}
+{% block title %}Add user - {{ g.company.name }}{% endblock %}
 {% block content %}
-<div class="page-head"><h1>Add User</h1></div>
-<div class="panel"><form method="post" class="form-grid">
-<div class="field"><label>Username</label><input name="username" required></div>
-<div class="field"><label>Full name</label><input name="full_name"></div>
-<div class="field"><label>Email</label><input name="email" type="email"></div>
-<div class="field"><label>Role</label><select name="role"><option value="staff">Staff</option><option value="admin">Admin</option><option value="owner">Owner</option><option value="viewer">Viewer</option></select></div>
-<div class="field"><label>Password</label><input name="password1" type="password" required></div>
-<div class="field"><label>Confirm password</label><input name="password2" type="password" required></div>
-<div class="form-actions"><button class="btn btn-accent">Save</button><a class="btn" href="{{ url_for('users.list', slug=g.company.slug) }}">Cancel</a></div>
-</form></div>
+<div class="page-head"><h1>Add user</h1><p class="page-sub">Create an account inside {{ g.company.name }}</p></div>
+<div class="panel">
+  <form method="post" class="form-grid" novalidate>
+    <div class="field"><label>Username</label><input name="username" required autocomplete="off"><small class="help">3-32 characters. Only needs to be unique inside this company.</small></div>
+    <div class="field"><label>Full name</label><input name="full_name" autocomplete="off"></div>
+    <div class="field"><label>Email</label><input name="email" type="email" autocomplete="off"></div>
+    <div class="field">
+      <label>Role</label>
+      <select name="role">
+        {% for r in roles %}
+        <option value="{{ r }}" {% if r == 'staff' %}selected{% endif %} {% if r == 'owner' and g.user.role != 'owner' %}disabled{% endif %}>{{ r }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Temporary password</label><input name="password1" type="password" required autocomplete="new-password"><small class="help">At least 8 characters. Ask them to change it after signing in.</small></div>
+    <div class="field"><label>Confirm password</label><input name="password2" type="password" required autocomplete="new-password"></div>
+    <div class="form-actions">
+      <button class="btn btn-accent">Create user</button>
+      <a class="btn" href="{{ url_for('users.list', slug=g.company.slug) }}">Cancel</a>
+    </div>
+  </form>
+</div>
 {% endblock %}

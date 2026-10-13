@@ -1,0 +1,27 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'fleet' %}
+{% block title %}Drivers - {{ g.company.name }}{% endblock %}
+{% block heading %}Drivers{% endblock %}
+{% block subheading %}{{ rows|length }} on file{% endblock %}
+{% block content %}
+<a class="m-fab" href="{{ url_for('mobile.drivers_new') }}" aria-label="Add driver">+</a>
+<div class="m-subnav">
+  <a class="m-subnav-link" href="{{ url_for('mobile.routes') }}">Routes &rarr;</a>
+</div>
+<div class="m-list">
+  {% for r in rows %}
+  <a class="m-item" href="{{ url_for('mobile.drivers_edit', did=r.id) }}">
+    <div class="m-item-main">
+      <strong>{{ r.name }}</strong>
+      <small>{{ r.phone or 'No phone' }}{% if r.licence_no %} &middot; {{ r.licence_no }}{% endif %}</small>
+    </div>
+    <div class="m-item-side">
+      {% if r.is_active %}<span class="m-tag ok">active</span>{% else %}<span class="m-tag">off duty</span>{% endif %}
+      {% if r.licence_expiry %}<small>lic {{ r.licence_expiry }}</small>{% endif %}
+    </div>
+  </a>
+  {% else %}
+  <div class="m-empty">No drivers yet.<br><a href="{{ url_for('mobile.drivers_new') }}">Add a driver</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

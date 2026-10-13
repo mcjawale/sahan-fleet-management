@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, g, flash, abort
 from functools import wraps
-from typing import Optional, Tuple
+from typing import Optional
 import re
 import json
 
@@ -17,23 +17,25 @@ def slugify(s: str) -> str:
     return s.strip('-')
 
 def resolve_from_url():
+    g.url_company = None
     m = re.match(r'^/app/([a-z0-9\-]+)/?', request.path)
     if not m:
-        g.company = None
-        g.company_id = None
         return
     slug = m.group(1)
     cur = db().execute('SELECT id,name,slug,is_active FROM companies WHERE slug=?', (slug,))
     row = cur.fetchone()
     if not row or row['is_active'] == 0:
         abort(404)
-    g.company = dict(row)
-    g.company_id = row['id']
+    if g.user is None:
+        return
+    if row['id'] != g.company_id:
+        abort(404)
+    g.url_company = dict(row)
 
 def require_auth(f):
     @wraps(f)
     def wrap(*args, **kwargs):
-        if 'user_id' not in g or 'user' not in g or g.user is None:
+        if g.user is None:
             return redirect(url_for('auth.login', next=request.url))
         return f(*args, **kwargs)
     return wrap
@@ -41,6 +43,10 @@ def require_auth(f):
 def require_company_admin(f):
     @wraps(f)
     def wrap(*args, **kwargs):
+        if g.user is None:
+            return redirect(url_for('auth.login', next=request.url))
+        if g.company is None:
+            abort(403)
         if g.user['role'] not in ('owner','admin'):
             abort(403)
         return f(*args, **kwargs)
@@ -49,6 +55,10 @@ def require_company_admin(f):
 def require_owner(f):
     @wraps(f)
     def wrap(*args, **kwargs):
+        if g.user is None:
+            return redirect(url_for('auth.login', next=request.url))
+        if g.company is None:
+            abort(403)
         if g.user['role'] != 'owner':
             abort(403)
         return f(*args, **kwargs)
@@ -75,3 +85,21 @@ def get_active_sub():
                            FROM subscriptions s JOIN plans p ON s.plan_id=p.id
                            WHERE s.company_id=? AND s.status IN ('trialing','active','past_due') LIMIT 1''', (cid,))
     return cur.fetchone() if cid else None
+
+def active_user_count() -> int:
+    if not g.company_id:
+        return 0
+    return db().execute('SELECT COUNT(*) FROM users WHERE company_id=? AND is_active=1',
+                        (g.company_id,)).fetchone()[0]
+
+def user_quota() -> Optional[int]:
+    sub = get_active_sub()
+    if sub is None:
+        return 0
+    return sub['max_users']
+
+def user_slots_left() -> Optional[int]:
+    limit = user_quota()
+    if limit is None or limit < 0:
+        return None
+    return max(0, limit - active_user_count())

@@ -1,0 +1,27 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'fleet' %}
+{% block title %}{{ 'Edit driver' if row else 'Add driver' }} - {{ g.company.name }}{% endblock %}
+{% block heading %}{{ 'Edit driver' if row else 'Add driver' }}{% endblock %}
+{% block content %}
+<form method="post" class="m-form" novalidate>
+  <div class="m-field">
+    <label for="name">Full name *</label>
+    <input id="name" name="name" required value="{{ row.name if row else '' }}">
+  </div>
+  <div class="m-field">
+    <label for="phone">Phone</label>
+    <input id="phone" name="phone" type="tel" inputmode="tel" value="{{ row.phone if row else '' }}" placeholder="0712 345 678">
+  </div>
+  <div class="m-field">
+    <label for="licence_no">Licence number</label>
+    <input id="licence_no" name="licence_no" value="{{ row.licence_no if row else '' }}">
+  </div>
+  <div class="m-field">
+    <label for="licence_expiry">Licence expiry</label>
+    <input id="licence_expiry" name="licence_expiry" type="date" value="{{ row.licence_expiry if row else '' }}">
+  </div>
+  <label class="m-check"><input type="checkbox" name="is_active" value="1" {% if not row or row.is_active %}checked{% endif %}> Available for trips</label>
+  <button class="m-btn m-btn-primary m-btn-block">{{ 'Save changes' if row else 'Add driver' }}</button>
+  <a class="m-btn m-btn-ghost m-btn-block" href="{{ url_for('mobile.drivers') }}">Cancel</a>
+</form>
+{% endblock %}

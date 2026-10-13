@@ -1,0 +1,32 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'records' %}
+{% block title %}Maintenance - {{ g.company.name }}{% endblock %}
+{% block heading %}Maintenance{% endblock %}
+{% block subheading %}{{ rows|length }} record(s){% endblock %}
+{% block content %}
+<a class="m-fab" href="{{ url_for('mobile.maintenance_new') }}" aria-label="Add maintenance item">+</a>
+<div class="m-subnav">
+  <a class="m-subnav-link" href="{{ url_for('mobile.fuel') }}">&larr; Fuel</a>
+</div>
+<div class="m-list">
+  {% for m in rows %}
+  <div class="m-item">
+    <div class="m-item-main">
+      <strong>{{ m.plate_no or 'Unassigned' }}</strong>
+      <small>{{ m.work }}</small>
+      <small>{{ m.date }}{% if m.next_due %} &middot; next due {{ m.next_due }}{% endif %}{% if m.cost_cents %} &middot; {{ '{:,.2f}'.format(m.cost_cents / 100) }}{% endif %}</small>
+    </div>
+    {% if m.status != 'done' %}
+    <form method="post" action="{{ url_for('mobile.maintenance_status', mid=m.id) }}" class="m-inline">
+      <input type="hidden" name="status" value="done">
+      <button class="m-tag-btn" type="submit">{{ m.status }} &rarr; done</button>
+    </form>
+    {% else %}
+    <span class="m-tag ok">done</span>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="m-empty">Nothing outstanding.<br><a href="{{ url_for('mobile.maintenance_new') }}">Add an item</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

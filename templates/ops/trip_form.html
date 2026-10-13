@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit trip' if row else 'New trip' }} - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>{{ 'Edit trip' if row else 'New trip' }}</h1><p class="page-sub">{% if row %}{{ row.trip_no }}{% else %}The trip number is generated automatically{% endif %}</p></div>
+<div class="panel">
+  <form method="post" class="form-grid" novalidate>
+    <div class="field"><label>Vehicle</label>
+      <select name="vehicle_id"><option value="">-- none --</option>
+        {% for v in vehicles %}<option value="{{ v.id }}" {% if row and row.vehicle_id == v.id %}selected{% endif %}>{{ v.plate_no }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Driver</label>
+      <select name="driver_id"><option value="">-- none --</option>
+        {% for d in drivers %}<option value="{{ d.id }}" {% if row and row.driver_id == d.id %}selected{% endif %}>{{ d.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Route</label>
+      <select name="route_id"><option value="">-- none --</option>
+        {% for r in routes %}<option value="{{ r.id }}" {% if row and row.route_id == r.id %}selected{% endif %}>{{ r.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Departure</label><input name="departure_at" value="{{ row.departure_at if row else '' }}" placeholder="YYYY-MM-DD HH:MM"></div>
+    <div class="field"><label>Arrival</label><input name="arrival_at" value="{{ row.arrival_at if row else '' }}" placeholder="YYYY-MM-DD HH:MM"></div>
+    <div class="field"><label>Distance (km)</label><input name="distance_km" type="number" step="0.1" min="0" value="{{ row.distance_km if row and row.distance_km else '' }}"></div>
+    <div class="field"><label>Seats</label><input name="seats" type="number" min="0" max="200" value="{{ row.seats if row else 0 }}"></div>
+    <div class="field"><label>Revenue</label><input name="revenue" inputmode="decimal" value="{{ '{:.2f}'.format(row.revenue_cents / 100) if row else '0.00' }}"></div>
+    <div class="field"><label>Cost</label><input name="cost" inputmode="decimal" value="{{ '{:.2f}'.format(row.cost_cents / 100) if row else '0.00' }}"></div>
+    <div class="field"><label>Fuel cost</label><input name="fuel" inputmode="decimal" value="{{ '{:.2f}'.format((row.fuel_cents or 0) / 100) if row else '0.00' }}"></div>
+    <div class="field"><label>Status</label>
+      <select name="status">
+        {% for s in statuses %}<option value="{{ s }}" {% if row and row.status == s %}selected{% elif not row and s == 'scheduled' %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-accent">{{ 'Save changes' if row else 'Create trip' }}</button>
+      <a class="btn" href="{{ url_for('ops.trips', slug=g.company.slug) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

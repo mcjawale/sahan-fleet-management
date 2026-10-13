@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Add fuel entry - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Add fuel entry</h1><p class="page-sub">{{ g.company.name }}</p></div>
+<div class="panel">
+  <form method="post" class="form-grid" novalidate>
+    <div class="field"><label>Vehicle</label>
+      <select name="vehicle_id"><option value="">-- none --</option>
+        {% for v in vehicles %}<option value="{{ v.id }}">{{ v.plate_no }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Driver</label>
+      <select name="driver_id"><option value="">-- none --</option>
+        {% for d in drivers %}<option value="{{ d.id }}">{{ d.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Date</label><input name="date" type="date" value=""></div>
+    <div class="field"><label>Amount</label><input name="amount" inputmode="decimal" value="0.00"></div>
+    <div class="field"><label>Litres</label><input name="quantity_l" inputmode="decimal" step="0.01" placeholder="e.g. 65.5"></div>
+    <div class="field"><label>Odometer (km)</label><input name="odometer" type="number" min="0" value="0"></div>
+    <div class="field wide"><label>Notes</label><textarea name="notes" rows="3"></textarea></div>
+    <div class="form-actions">
+      <button class="btn btn-accent">Save entry</button>
+      <a class="btn" href="{{ url_for('records.fuel', slug=g.company.slug) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

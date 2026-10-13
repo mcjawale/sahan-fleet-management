@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit route' if row else 'Add route' }} - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>{{ 'Edit route' if row else 'Add route' }}</h1><p class="page-sub">{{ g.company.name }}</p></div>
+<div class="panel">
+  <form method="post" class="form-grid" novalidate>
+    <div class="field"><label>Route name *</label><input name="name" required value="{{ row.name if row else '' }}" placeholder="e.g. Nairobi - Mombasa"></div>
+    <div class="field"><label>Origin</label><input name="origin" value="{{ row.origin if row else '' }}"></div>
+    <div class="field"><label>Destination</label><input name="destination" value="{{ row.destination if row else '' }}"></div>
+    <div class="field"><label>Distance (km)</label><input name="distance_km" type="number" step="0.1" min="0" value="{{ row.distance_km if row and row.distance_km else '' }}"></div>
+    <div class="form-actions">
+      <button class="btn btn-accent">{{ 'Save changes' if row else 'Add route' }}</button>
+      <a class="btn" href="{{ url_for('fleet.routes', slug=g.company.slug) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

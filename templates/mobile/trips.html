@@ -1,0 +1,29 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'trips' %}
+{% block title %}Trips - {{ g.company.name }}{% endblock %}
+{% block heading %}Trips{% endblock %}
+{% block subheading %}{{ rows|length }} shown{% endblock %}
+{% block content %}
+<a class="m-fab" href="{{ url_for('mobile.trips_new') }}" aria-label="New trip">+</a>
+<div class="m-chips">
+  <a class="m-chip {% if not active %}on{% endif %}" href="{{ url_for('mobile.trips') }}">All</a>
+  {% for s in statuses %}<a class="m-chip {% if active == s %}on{% endif %}" href="{{ url_for('mobile.trips', status=s) }}">{{ s }}</a>{% endfor %}
+</div>
+<div class="m-list">
+  {% for t in rows %}
+  <a class="m-item" href="{{ url_for('mobile.trips_edit', tid=t.id) }}">
+    <div class="m-item-main">
+      <strong>{{ t.trip_no }}</strong>
+      <small>{{ t.rname or 'No route' }} &middot; {{ t.plate_no or 'No vehicle' }}</small>
+      <small>{{ t.departure_at or 'No departure set' }}{% if t.dname %} &middot; {{ t.dname }}{% endif %}</small>
+    </div>
+    <div class="m-item-side">
+      <span class="m-tag {{ t.status|replace(' ', '_') }}">{{ t.status }}</span>
+      <small>{{ t.seats }} seats</small>
+    </div>
+  </a>
+  {% else %}
+  <div class="m-empty">No trips found.<br><a href="{{ url_for('mobile.trips_new') }}">Create a trip</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

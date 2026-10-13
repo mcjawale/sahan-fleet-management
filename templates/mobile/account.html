@@ -1,0 +1,31 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'more' %}
+{% block title %}Account - {{ g.company.name }}{% endblock %}
+{% block heading %}Account{% endblock %}
+{% block content %}
+<div class="m-card">
+  <div class="m-kv"><span>Signed in as</span><strong>{{ g.user.username }}</strong></div>
+  <div class="m-kv"><span>Name</span><strong>{{ g.user.full_name or '-' }}</strong></div>
+  <div class="m-kv"><span>Role</span><strong>{{ g.user.role }}</strong></div>
+  <div class="m-kv"><span>Company</span><strong>{{ g.company.name }}</strong></div>
+  <div class="m-kv"><span>Company code</span><strong>{{ g.company.slug }}</strong></div>
+</div>
+
+<h2 class="m-h2">Your data</h2>
+<div class="m-kpis">
+  <div class="m-kpi"><span class="m-kpi-val">{{ counts.vehicles }}</span><span class="m-kpi-lbl">Vehicles</span></div>
+  <div class="m-kpi"><span class="m-kpi-val">{{ counts.drivers }}</span><span class="m-kpi-lbl">Drivers</span></div>
+  <div class="m-kpi"><span class="m-kpi-val">{{ counts.trips }}</span><span class="m-kpi-lbl">Trips</span></div>
+</div>
+
+<h2 class="m-h2">More</h2>
+<div class="m-list">
+  <a class="m-item" href="{{ url_for('mobile.vehicles') }}"><div class="m-item-main"><strong>All vehicles</strong></div><span class="m-chev">&rsaquo;</span></a>
+  <a class="m-item" href="{{ url_for('mobile.drivers') }}"><div class="m-item-main"><strong>Drivers</strong></div><span class="m-chev">&rsaquo;</span></a>
+  <a class="m-item" href="{{ url_for('mobile.routes') }}"><div class="m-item-main"><strong>Routes</strong></div><span class="m-chev">&rsaquo;</span></a>
+  <a class="m-item" href="{{ url_for('dashboard.index', slug=g.company.slug) }}"><div class="m-item-main"><strong>Open desktop version</strong><small>Full desktop layout</small></div><span class="m-chev">&rsaquo;</span></a>
+</div>
+
+<a class="m-btn m-btn-danger m-btn-block" href="{{ url_for('mobile.logout') }}">Sign out</a>
+<p class="m-fine">MCJ Sahan Fleet Management System<br>Need help? +252 61 100 9962</p>
+{% endblock %}

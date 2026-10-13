@@ -16,19 +16,25 @@ CREATE TABLE IF NOT EXISTS companies (
 );
 
 -- Users
+-- A user belongs to exactly one company. Usernames are unique WITHIN a company
+-- (not globally) so every company can have its own "admin" / "dispatcher".
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  username TEXT NOT NULL UNIQUE,
+  username TEXT NOT NULL,
   password_hash TEXT NOT NULL,
   full_name TEXT,
   email TEXT,
   role TEXT NOT NULL DEFAULT 'staff' CHECK (role IN ('owner','admin','staff','viewer')),
   is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0,1)),
+  failed_attempts INTEGER NOT NULL DEFAULT 0,
+  locked_until TEXT,
   last_login_at TEXT,
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (company_id, username)
 );
 CREATE INDEX IF NOT EXISTS idx_users_company ON users(company_id);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(lower(email));
 
 -- Audit
 CREATE TABLE IF NOT EXISTS audit_log (

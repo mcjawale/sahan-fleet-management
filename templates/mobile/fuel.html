@@ -1,0 +1,25 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'records' %}
+{% block title %}Fuel - {{ g.company.name }}{% endblock %}
+{% block heading %}Fuel{% endblock %}
+{% block subheading %}{{ '{:,.2f}'.format(mtd / 100) }} this month{% endblock %}
+{% block content %}
+<a class="m-fab" href="{{ url_for('mobile.fuel_new') }}" aria-label="Add fuel entry">+</a>
+<div class="m-subnav">
+  <a class="m-subnav-link" href="{{ url_for('mobile.maintenance') }}">Maintenance &rarr;</a>
+</div>
+<div class="m-list">
+  {% for f in rows %}
+  <div class="m-item">
+    <div class="m-item-main">
+      <strong>{{ f.plate_no or 'No vehicle' }}</strong>
+      <small>{{ f.date }}{% if f.quantity_l %} &middot; {{ f.quantity_l }} L{% endif %}{% if f.odometer %} &middot; {{ '{:,}'.format(f.odometer) }} km{% endif %}</small>
+      {% if f.notes %}<small>{{ f.notes }}</small>{% endif %}
+    </div>
+    <span class="m-amount">{{ '{:,.2f}'.format(f.amount_cents / 100) }}</span>
+  </div>
+  {% else %}
+  <div class="m-empty">No fuel entries yet.<br><a href="{{ url_for('mobile.fuel_new') }}">Log a fill</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

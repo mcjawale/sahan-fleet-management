@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit maintenance' if row else 'Add maintenance' }} - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>{{ 'Edit maintenance item' if row else 'Add maintenance item' }}</h1><p class="page-sub">{{ g.company.name }}</p></div>
+<div class="panel">
+  <form method="post" class="form-grid" novalidate>
+    <div class="field"><label>Vehicle</label>
+      <select name="vehicle_id"><option value="">-- none --</option>
+        {% for v in vehicles %}<option value="{{ v.id }}" {% if row and row.vehicle_id == v.id %}selected{% endif %}>{{ v.plate_no }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field wide"><label>Work required *</label><input name="work" required value="{{ row.work if row else '' }}" placeholder="e.g. Oil change and filter"></div>
+    <div class="field"><label>Status</label>
+      <select name="status">
+        {% for s in statuses %}<option value="{{ s }}" {% if row and row.status == s %}selected{% elif not row and s == 'open' %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Cost</label><input name="cost" inputmode="decimal" value="{{ '{:.2f}'.format((row.cost_cents or 0) / 100) if row else '0.00' }}"></div>
+    <div class="field"><label>Date</label><input name="date" type="date" value="{{ row.date if row else '' }}"></div>
+    <div class="field"><label>Next due</label><input name="next_due" type="date" value="{{ row.next_due if row else '' }}"></div>
+    <div class="field wide"><label>Notes</label><textarea name="notes" rows="3">{{ row.notes if row else '' }}</textarea></div>
+    <div class="form-actions">
+      <button class="btn btn-accent">{{ 'Save changes' if row else 'Add item' }}</button>
+      <a class="btn" href="{{ url_for('records.maintenance', slug=g.company.slug) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

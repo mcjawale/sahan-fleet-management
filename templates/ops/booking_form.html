@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit booking' if row else 'New booking' }} - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>{{ 'Edit booking' if row else 'New booking' }}</h1><p class="page-sub">{% if row %}{{ row.booking_no }}{% else %}The booking number is generated automatically{% endif %}</p></div>
+<div class="panel">
+  <form method="post" class="form-grid" novalidate>
+    <div class="field"><label>Passenger name *</label><input name="passenger_name" required value="{{ row.passenger_name if row else '' }}"></div>
+    <div class="field"><label>Phone</label><input name="phone" inputmode="tel" value="{{ row.phone if row else '' }}"></div>
+    <div class="field"><label>Trip</label>
+      <select name="trip_id"><option value="">-- unassigned --</option>
+        {% for t in trips_rows %}<option value="{{ t.id }}" {% if row and row.trip_id == t.id %}selected{% endif %}>{{ t.trip_no }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Pickup</label><input name="pickup" value="{{ row.pickup if row else '' }}"></div>
+    <div class="field"><label>Dropoff</label><input name="dropoff" value="{{ row.dropoff if row else '' }}"></div>
+    <div class="field"><label>Seats</label><input name="seats" type="number" min="1" max="200" value="{{ row.seats if row else 1 }}"></div>
+    <div class="field"><label>Fare</label><input name="fare" inputmode="decimal" value="{{ '{:.2f}'.format(row.fare_cents / 100) if row else '0.00' }}"></div>
+    <div class="field"><label>Status</label>
+      <select name="status">
+        {% for s in statuses %}<option value="{{ s }}" {% if row and row.status == s %}selected{% elif not row and s == 'booked' %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-accent">{{ 'Save changes' if row else 'Create booking' }}</button>
+      <a class="btn" href="{{ url_for('ops.bookings', slug=g.company.slug) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

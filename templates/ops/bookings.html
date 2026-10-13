@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Bookings - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Bookings</h1><p class="page-sub">{{ rows|length }} booking(s) shown</p></div>
+<div class="quick-actions">
+  <a class="btn btn-accent" href="{{ url_for('ops.bookings_new', slug=g.company.slug) }}">+ New Booking</a>
+</div>
+<div class="filter-bar">
+  <a class="chip {% if not active %}active{% endif %}" href="{{ url_for('ops.bookings', slug=g.company.slug) }}">All</a>
+  {% for s in statuses %}<a class="chip {% if active == s %}active{% endif %}" href="{{ url_for('ops.bookings', slug=g.company.slug, status=s) }}">{{ s }}</a>{% endfor %}
+</div>
+<div class="panel">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Booking</th><th>Passenger</th><th>Phone</th><th>Pickup</th><th>Dropoff</th><th class="num">Seats</th><th class="num">Fare</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for b in rows %}
+        <tr>
+          <td><strong>{{ b.booking_no }}</strong></td>
+          <td>{{ b.passenger_name }}</td>
+          <td>{{ b.phone or '-' }}</td>
+          <td>{{ b.pickup or '-' }}</td>
+          <td>{{ b.dropoff or '-' }}</td>
+          <td class="num">{{ b.seats }}</td>
+          <td class="num">{{ '{:,.2f}'.format(b.fare_cents / 100) }}</td>
+          <td><span class="badge {{ b.status }}">{{ b.status }}</span></td>
+          <td class="row-actions">
+            <a class="btn btn-sm" href="{{ url_for('ops.bookings_edit', slug=g.company.slug, bid=b.id) }}">Edit</a>
+            <form method="post" action="{{ url_for('ops.bookings_delete', slug=g.company.slug, bid=b.id) }}" class="inline-form">
+              <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Remove booking {{ b.booking_no }}?')">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="9" class="empty">No bookings found.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

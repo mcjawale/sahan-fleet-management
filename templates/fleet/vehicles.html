@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Vehicles - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Vehicles</h1><p class="page-sub">{{ rows|length }} vehicle(s) in {{ g.company.name }}</p></div>
+<div class="quick-actions">
+  <a class="btn btn-accent" href="{{ url_for('fleet.vehicles_new', slug=g.company.slug) }}">+ Add Vehicle</a>
+</div>
+<div class="panel">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Plate</th><th>Make / Model</th><th class="num">Year</th><th class="num">Seats</th><th class="num">Odometer</th><th class="num">Trips</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td><strong>{{ r.plate_no }}</strong></td>
+          <td>{{ [r.make, r.model]|select|join(' ') or '-' }}</td>
+          <td class="num">{{ r.year or '-' }}</td>
+          <td class="num">{{ r.capacity or '-' }}</td>
+          <td class="num">{{ '{:,}'.format(r.odometer) }}</td>
+          <td class="num">{{ r.trips }}</td>
+          <td><span class="badge {{ r.status }}">{{ r.status }}</span></td>
+          <td class="row-actions">
+            <a class="btn btn-sm" href="{{ url_for('fleet.vehicles_edit', slug=g.company.slug, vid=r.id) }}">Edit</a>
+            <form method="post" action="{{ url_for('fleet.vehicles_delete', slug=g.company.slug, vid=r.id) }}" class="inline-form">
+              <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Remove {{ r.plate_no }}?')">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="8" class="empty">No vehicles yet. Add your first one above.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

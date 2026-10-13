@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Routes - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Routes</h1><p class="page-sub">{{ rows|length }} route(s) in {{ g.company.name }}</p></div>
+<div class="quick-actions">
+  <a class="btn btn-accent" href="{{ url_for('fleet.routes_new', slug=g.company.slug) }}">+ Add Route</a>
+</div>
+<div class="panel">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Route</th><th>Origin</th><th>Destination</th><th class="num">Distance (km)</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td><strong>{{ r.name }}</strong></td>
+          <td>{{ r.origin or '-' }}</td>
+          <td>{{ r.destination or '-' }}</td>
+          <td class="num">{{ r.distance_km or '-' }}</td>
+          <td class="row-actions">
+            <a class="btn btn-sm" href="{{ url_for('fleet.routes_edit', slug=g.company.slug, rid=r.id) }}">Edit</a>
+            <form method="post" action="{{ url_for('fleet.routes_delete', slug=g.company.slug, rid=r.id) }}" class="inline-form">
+              <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Remove route {{ r.name }}?')">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" class="empty">No routes yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'fleet' %}
+{% block title %}{{ 'Edit route' if row else 'Add route' }} - {{ g.company.name }}{% endblock %}
+{% block heading %}{{ 'Edit route' if row else 'Add route' }}{% endblock %}
+{% block content %}
+<form method="post" class="m-form" novalidate>
+  <div class="m-field">
+    <label for="name">Route name *</label>
+    <input id="name" name="name" required value="{{ row.name if row else '' }}" placeholder="Nairobi - Mombasa">
+  </div>
+  <div class="m-field">
+    <label for="origin">Origin</label>
+    <input id="origin" name="origin" value="{{ row.origin if row else '' }}">
+  </div>
+  <div class="m-field">
+    <label for="destination">Destination</label>
+    <input id="destination" name="destination" value="{{ row.destination if row else '' }}">
+  </div>
+  <div class="m-field">
+    <label for="distance_km">Distance (km)</label>
+    <input id="distance_km" name="distance_km" type="number" step="0.1" inputmode="decimal" min="0" value="{{ row.distance_km if row and row.distance_km else '' }}">
+  </div>
+  <button class="m-btn m-btn-primary m-btn-block">{{ 'Save changes' if row else 'Add route' }}</button>
+  <a class="m-btn m-btn-ghost m-btn-block" href="{{ url_for('mobile.routes') }}">Cancel</a>
+</form>
+{% endblock %}

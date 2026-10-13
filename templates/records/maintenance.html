@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Maintenance - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Maintenance</h1><p class="page-sub">{{ rows|length }} record(s)</p></div>
+<div class="quick-actions">
+  <a class="btn btn-accent" href="{{ url_for('records.maintenance_new', slug=g.company.slug) }}">+ Add Item</a>
+</div>
+<div class="panel">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Vehicle</th><th>Work</th><th class="num">Cost</th><th>Next due</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for m in rows %}
+        <tr>
+          <td>{{ m.date }}</td>
+          <td>{{ m.plate_no or '-' }}</td>
+          <td>{{ m.work }}</td>
+          <td class="num">{{ '{:,.2f}'.format((m.cost_cents or 0) / 100) }}</td>
+          <td>{{ m.next_due or '-' }}</td>
+          <td><span class="badge {{ m.status }}">{{ m.status }}</span></td>
+          <td class="row-actions">
+            <a class="btn btn-sm" href="{{ url_for('records.maintenance_edit', slug=g.company.slug, mid=m.id) }}">Edit</a>
+            <form method="post" action="{{ url_for('records.maintenance_delete', slug=g.company.slug, mid=m.id) }}" class="inline-form">
+              <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Remove this maintenance item?')">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="empty">No maintenance records.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

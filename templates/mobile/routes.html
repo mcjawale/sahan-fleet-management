@@ -1,0 +1,24 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'fleet' %}
+{% block title %}Routes - {{ g.company.name }}{% endblock %}
+{% block heading %}Routes{% endblock %}
+{% block subheading %}{{ rows|length }} defined{% endblock %}
+{% block content %}
+<a class="m-fab" href="{{ url_for('mobile.routes_new') }}" aria-label="Add route">+</a>
+<div class="m-subnav">
+  <a class="m-subnav-link" href="{{ url_for('mobile.drivers') }}">&larr; Drivers</a>
+</div>
+<div class="m-list">
+  {% for r in rows %}
+  <a class="m-item" href="{{ url_for('mobile.routes_edit', rid=r.id) }}">
+    <div class="m-item-main">
+      <strong>{{ r.name }}</strong>
+      <small>{{ (r.origin or '?') }} &rarr; {{ (r.destination or '?') }}</small>
+    </div>
+    {% if r.distance_km %}<span class="m-tag">{{ r.distance_km }} km</span>{% endif %}
+  </a>
+  {% else %}
+  <div class="m-empty">No routes yet.<br><a href="{{ url_for('mobile.routes_new') }}">Add a route</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

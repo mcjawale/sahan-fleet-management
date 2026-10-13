@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}My account - {{ g.company.name if g.company }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>My account</h1><p class="page-sub">Your sign-in details for this company</p></div>
+
+<div class="panel">
+  <table>
+    <tbody>
+      <tr><th>Company</th><td>{{ g.company.name if g.company else 'No active company' }}</td></tr>
+      <tr><th>Username</th><td>{{ user.username }}</td></tr>
+      <tr><th>Role</th><td>{{ user.role }}</td></tr>
+      <tr><th>Active users</th><td>{{ user_count }}{% if sub and sub['max_users'] is not none and sub['max_users'] >= 0 %} of {{ sub['max_users'] }}{% endif %}</td></tr>
+      <tr><th>Plan</th><td>{% if sub %}{{ sub.name }} ({{ sub.status }}){% else %}No active plan{% endif %}</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="grid-2">
+  <div class="panel">
+    <h2>Profile details</h2>
+    <form method="post" class="form-grid">
+      <input type="hidden" name="action" value="details">
+      <div class="field"><label>Full name</label><input name="full_name" value="{{ user.full_name or '' }}"></div>
+      <div class="field"><label>Email</label><input name="email" type="email" value="{{ user.email or '' }}"></div>
+      <div class="form-actions"><button class="btn btn-accent">Save details</button></div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Change password</h2>
+    <form method="post" class="form-grid">
+      <input type="hidden" name="action" value="password">
+      <div class="field"><label>Current password</label><input name="current_password" type="password" required autocomplete="current-password"></div>
+      <div class="field"><label>New password</label><input name="password1" type="password" required autocomplete="new-password"><small class="help">At least 8 characters.</small></div>
+      <div class="field"><label>Confirm new password</label><input name="password2" type="password" required autocomplete="new-password"></div>
+      <div class="form-actions"><button class="btn btn-accent">Change password</button></div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Trips - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Trips</h1><p class="page-sub">{{ rows|length }} trip(s) shown</p></div>
+<div class="quick-actions">
+  <a class="btn btn-accent" href="{{ url_for('ops.trips_new', slug=g.company.slug) }}">+ New Trip</a>
+  <a class="btn" href="{{ url_for('ops.bookings', slug=g.company.slug) }}">Bookings</a>
+</div>
+<div class="filter-bar">
+  <a class="chip {% if not active %}active{% endif %}" href="{{ url_for('ops.trips', slug=g.company.slug) }}">All</a>
+  {% for s in statuses %}<a class="chip {% if active == s %}active{% endif %}" href="{{ url_for('ops.trips', slug=g.company.slug, status=s) }}">{{ s }}</a>{% endfor %}
+</div>
+<div class="panel">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Trip no</th><th>Departure</th><th>Route</th><th>Vehicle</th><th>Driver</th><th class="num">Seats</th><th class="num">Revenue</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for t in rows %}
+        <tr>
+          <td><strong>{{ t.trip_no }}</strong></td>
+          <td>{{ t.departure_at or '-' }}</td>
+          <td>{{ t.rname or '-' }}</td>
+          <td>{{ t.plate_no or '-' }}</td>
+          <td>{{ t.dname or '-' }}</td>
+          <td class="num">{{ t.seats }}</td>
+          <td class="num">{{ '{:,.2f}'.format(t.revenue_cents / 100) }}</td>
+          <td><span class="badge {{ t.status }}">{{ t.status }}</span></td>
+          <td class="row-actions">
+            <a class="btn btn-sm" href="{{ url_for('ops.trips_edit', slug=g.company.slug, tid=t.id) }}">Edit</a>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="9" class="empty">No trips found.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -526,3 +526,50 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   tr:hover td { background: transparent; }
   .donut-wrap, .stat-bars { page-break-inside: avoid; }
 }
+/* ---------- Filters, pills, helpers ---------- */
+.filter-bar { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+.chip {
+  font-size: 12.5px; font-weight: 700; padding: 6px 13px; border-radius: 999px;
+  background: #fff; border: 1px solid var(--line); color: var(--muted); white-space: nowrap;
+}
+.chip:hover { text-decoration: none; border-color: var(--brand-2); color: var(--brand); }
+.chip.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+.pill {
+  display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 9px;
+  border-radius: 999px; background: #e2e8f0; color: #334155; white-space: nowrap;
+}
+.pill.ok { background: #dcfce7; color: var(--ok); }
+.pill.bad { background: #fee2e2; color: var(--err); }
+
+.field .help, .help { font-size: 11.5px; color: var(--muted); margin-top: 4px; display: block; }
+.field.wide, .wide { grid-column: 1 / -1; }
+.check { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; }
+.check input { width: 17px; height: 17px; accent-color: var(--brand); }
+
+.row-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.inline-form { display: inline; margin: 0; }
+
+.fill.blue { background: var(--blue); }
+
+.plan-card {
+  border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: #fff;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.plan-card.current { border-color: var(--brand-2); box-shadow: 0 0 0 3px rgba(37, 99, 235, .12); }
+.plan-name { font-size: 15px; font-weight: 800; color: var(--brand-dark); }
+.plan-price { font-size: 24px; font-weight: 800; color: var(--brand-dark); }
+.plan-price small { font-size: 12px; font-weight: 600; color: var(--muted); }
+.plan-card ul { margin: 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
+.plan-card li { margin-bottom: 3px; }
+
+.mobile-jump { display: none; }
+@media (max-width: 860px) {
+  .mobile-jump {
+    display: block; margin-bottom: 14px; text-align: center;
+    background: #dbeafe; border: 1px solid #93c5fd; border-radius: 10px; padding: 10px;
+    font-weight: 700; font-size: 13.5px;
+  }
+  .mobile-jump a { text-decoration: none; }
+  .row-actions { min-width: 130px; }
+}

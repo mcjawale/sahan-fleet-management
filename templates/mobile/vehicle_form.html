@@ -1,0 +1,32 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'fleet' %}
+{% block title %}{{ 'Edit vehicle' if row else 'Add vehicle' }} - {{ g.company.name }}{% endblock %}
+{% block heading %}{{ 'Edit vehicle' if row else 'Add vehicle' }}{% endblock %}
+{% block content %}
+<form method="post" class="m-form" novalidate>
+  <div class="m-field">
+    <label for="plate_no">Plate number *</label>
+    <input id="plate_no" name="plate_no" required value="{{ row.plate_no if row else '' }}" placeholder="KDG 482R" autocapitalize="characters">
+  </div>
+  <div class="m-row">
+    <div class="m-field"><label for="make">Make</label><input id="make" name="make" value="{{ row.make if row else '' }}" placeholder="Toyota"></div>
+    <div class="m-field"><label for="model">Model</label><input id="model" name="model" value="{{ row.model if row else '' }}" placeholder="Hiace"></div>
+  </div>
+  <div class="m-row">
+    <div class="m-field"><label for="year">Year</label><input id="year" name="year" type="number" inputmode="numeric" min="1900" max="2100" value="{{ row.year if row and row.year else '' }}"></div>
+    <div class="m-field"><label for="capacity">Seats</label><input id="capacity" name="capacity" type="number" inputmode="numeric" min="0" max="200" value="{{ row.capacity if row and row.capacity is not none else '' }}"></div>
+  </div>
+  <div class="m-field">
+    <label for="odometer">Odometer (km)</label>
+    <input id="odometer" name="odometer" type="number" inputmode="numeric" min="0" value="{{ row.odometer if row else 0 }}">
+  </div>
+  <div class="m-field">
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      {% for s in statuses %}<option value="{{ s }}" {% if row and row.status == s %}selected{% elif not row and s == 'available' %}selected{% endif %}>{{ s }}</option>{% endfor %}
+    </select>
+  </div>
+  <button class="m-btn m-btn-primary m-btn-block">{{ 'Save changes' if row else 'Add vehicle' }}</button>
+  <a class="m-btn m-btn-ghost m-btn-block" href="{{ url_for('mobile.vehicles') }}">Cancel</a>
+</form>
+{% endblock %}

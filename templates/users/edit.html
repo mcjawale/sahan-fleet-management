@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Edit user - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Edit user</h1><p class="page-sub">{{ row.username }}</p></div>
+<div class="panel">
+  <form method="post" class="form-grid">
+    <div class="field"><label>Username</label><input value="{{ row.username }}" disabled></div>
+    <div class="field"><label>Full name</label><input name="full_name" value="{{ row.full_name or '' }}"></div>
+    <div class="field"><label>Email</label><input name="email" type="email" value="{{ row.email or '' }}"></div>
+    <div class="field">
+      <label>Role</label>
+      <select name="role">
+        {% for r in roles %}
+        <option value="{{ r }}" {% if row.role == r %}selected{% endif %} {% if r == 'owner' and g.user.role != 'owner' %}disabled{% endif %}>{{ r }}</option>
+        {% endfor %}
+      </select>
+      {% if g.user.role != 'owner' %}<small class="help">Only the owner can create or promote owners.</small>{% endif %}
+    </div>
+    <div class="field checkbox">
+      <label><input type="checkbox" name="is_active" value="1" {% if row.is_active %}checked{% endif %}> Account active</label>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-accent">Save changes</button>
+      <a class="btn" href="{{ url_for('users.list', slug=g.company.slug) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

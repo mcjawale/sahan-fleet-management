@@ -1,21 +1,22 @@
 {% extends 'base.html' %}
-{% block title %}Sign up - MCJ Sahan Fleet Management System{% endblock %}
+{% block title %}Register your company{% endblock %}
 {% block content %}
 <div class="login-screen">
   <div class="login-wrap">
     <div class="login-card">
-      <h1>Create your company</h1>
-      <p class="sub">Each company has its own isolated data</p>
-      <form method="post">
-        <div class="field"><label>Company name</label><input name="company" required></div>
-        <div class="field"><label>Your full name</label><input name="full_name" required></div>
-        <div class="field"><label>Username</label><input name="username" required></div>
-        <div class="field"><label>Email</label><input name="email" type="email"></div>
-        <div class="field"><label>Password</label><input name="password1" type="password" required></div>
-        <div class="field"><label>Confirm password</label><input name="password2" type="password" required></div>
+      <h1>Register your company</h1>
+      <p class="sub">You become the owner and can add your own staff accounts</p>
+      <form method="post" novalidate>
+        <div class="field"><label for="company">Company name</label><input id="company" name="company" value="{{ form.company or '' }}" required></div>
+        <div class="field"><label for="full_name">Your full name</label><input id="full_name" name="full_name" value="{{ form.full_name or '' }}" required autocomplete="name"></div>
+        <div class="field"><label for="username">Username</label><input id="username" name="username" value="{{ form.username or '' }}" required autocomplete="username"><small class="help">3-32 characters. Letters, numbers, dot, underscore, hyphen.</small></div>
+        <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" value="{{ form.email or '' }}" autocomplete="email"></div>
+        <div class="field"><label for="phone">Phone</label><input id="phone" name="phone" value="{{ form.phone or '' }}" autocomplete="tel"></div>
+        <div class="field"><label for="password1">Password</label><input id="password1" name="password1" type="password" required autocomplete="new-password"><small class="help">At least 8 characters.</small></div>
+        <div class="field"><label for="password2">Confirm password</label><input id="password2" name="password2" type="password" required autocomplete="new-password"></div>
         <button class="btn btn-accent">Create company &amp; continue</button>
       </form>
-      <p class="hint"><a href="{{ url_for('auth.login') }}">Back to login</a></p>
+      <p class="hint">Already registered? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
     </div>
   </div>
 </div>

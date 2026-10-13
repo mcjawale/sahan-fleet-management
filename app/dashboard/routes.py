@@ -3,11 +3,6 @@ from tenancy import require_auth
 
 bp = Blueprint('dashboard', __name__, url_prefix='/app/<slug>')
 
-@bp.url_value_preprocessor
-def pull_slug(endpoint, values):
-    from tenancy import resolve_from_url
-    resolve_from_url()
-
 @bp.before_request
 def ensure_auth():
     if not g.user:
@@ -15,12 +10,12 @@ def ensure_auth():
         return redirect(url_for('auth.login', next=request.url))
 
 @bp.route('/')
-def index():
+def index(slug):
     db = __import__('app').get_db()
     cid = g.company_id
     def count(q, *p):
-        r = db.execute(q, (*p,)) if p else db.execute(q)
-        return r.fetchone()[0] or 0
+        params = p[0] if (len(p) == 1 and isinstance(p[0], (tuple, list))) else p
+        return db.execute(q, params).fetchone()[0] or 0
     fleet = count('SELECT COUNT(*) FROM vehicles WHERE company_id=?', (cid,))
     active_trips = count("SELECT COUNT(*) FROM trips WHERE company_id=? AND status IN ('scheduled','in transit')", (cid,))
     pending_b = count("SELECT COUNT(*) FROM bookings WHERE company_id=? AND status='booked'", (cid,))

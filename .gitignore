@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Environment / secrets
+.env
+*.env
+
+# Database (created automatically on first run)
+instance/*.sqlite
+instance/*.sqlite3
+instance/*.db
+
+# Logs
+*.log
+
+# Editor / OS
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store
+
+# Stray prototype / media files
+Screenshot*
+*.jpeg
+*.jpg
+index.html

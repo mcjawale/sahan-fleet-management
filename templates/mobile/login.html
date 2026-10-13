@@ -1,0 +1,45 @@
+{% extends 'mobile/base.html' %}
+{% block title %}Sign in - MCJ Sahan Fleet{% endblock %}
+{% block anonymous %}
+<div class="m-login">
+  <div class="m-login-head">
+    <div class="m-login-logo">
+      <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><rect x="2" y="6" width="11" height="9.5" rx="1" fill="rgba(255,255,255,.22)" stroke="#fff" stroke-width="1.5"/><path d="M13 9h3.6l3.4 3.4v3.1H13z" fill="rgba(255,255,255,.3)" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><circle cx="6.3" cy="17" r="2.1" fill="#0b1a3a" stroke="#fff" stroke-width="1"/><circle cx="16.6" cy="17" r="2.1" fill="#0b1a3a" stroke="#fff" stroke-width="1"/></svg>
+    </div>
+    <h1>MCJ Sahan</h1>
+    <p>Fleet Management System</p>
+  </div>
+
+  <div class="m-login-card">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}{% for cat, msg in messages %}<div class="m-flash {{ cat }}">{{ msg }}</div>{% endfor %}{% endif %}
+    {% endwith %}
+
+    <form method="post" novalidate autocomplete="on">
+      <div class="m-field">
+        <label for="company">Company code</label>
+        <input id="company" name="company" value="{{ company_ref or '' }}" required autofocus
+               autocapitalize="none" autocorrect="off" spellcheck="false"
+               autocomplete="organization" placeholder="mcj-sahan">
+      </div>
+      <div class="m-field">
+        <label for="username">Username</label>
+        <input id="username" name="username" value="{{ identifier or '' }}" required
+               autocapitalize="none" autocorrect="off" spellcheck="false"
+               autocomplete="username" placeholder="your username">
+      </div>
+      <div class="m-field">
+        <label for="password">Password</label>
+        <div class="m-pass">
+          <input id="password" name="password" type="password" required autocomplete="current-password">
+          <button type="button" class="m-eye" onclick="var p=document.getElementById('password');p.type=p.type==='password'?'text':'password';this.textContent=p.type==='password'?'Show':'Hide'">Show</button>
+        </div>
+      </div>
+      <button class="m-btn m-btn-primary m-btn-block">Sign in</button>
+    </form>
+
+    <p class="m-login-foot">Same account as the desktop site.</p>
+    <a class="m-login-alt" href="{{ url_for('auth.login') }}">Open desktop version</a>
+  </div>
+</div>
+{% endblock %}

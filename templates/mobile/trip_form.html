@@ -1,0 +1,64 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'trips' %}
+{% block title %}{{ 'Edit trip' if row else 'New trip' }} - {{ g.company.name }}{% endblock %}
+{% block heading %}{{ 'Edit trip' if row else 'New trip' }}{% endblock %}
+{% block subheading %}{{ row.trip_no if row else 'Number generated automatically' }}{% endblock %}
+{% block content %}
+<form method="post" class="m-form" novalidate>
+  <div class="m-field">
+    <label for="vehicle_id">Vehicle</label>
+    <select id="vehicle_id" name="vehicle_id"><option value="">-- none --</option>
+      {% for v in vehicles %}<option value="{{ v.id }}" {% if row and row.vehicle_id == v.id %}selected{% endif %}>{{ v.plate_no }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="m-field">
+    <label for="driver_id">Driver</label>
+    <select id="driver_id" name="driver_id"><option value="">-- none --</option>
+      {% for d in drivers %}<option value="{{ d.id }}" {% if row and row.driver_id == d.id %}selected{% endif %}>{{ d.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="m-field">
+    <label for="route_id">Route</label>
+    <select id="route_id" name="route_id"><option value="">-- none --</option>
+      {% for r in routes %}<option value="{{ r.id }}" {% if row and row.route_id == r.id %}selected{% endif %}>{{ r.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="m-row">
+    <div class="m-field"><label for="departure_at">Departure</label><input id="departure_at" name="departure_at" type="datetime-local" value="{{ row.departure_at if row else '' }}"></div>
+    <div class="m-field"><label for="arrival_at">Arrival</label><input id="arrival_at" name="arrival_at" type="datetime-local" value="{{ row.arrival_at if row else '' }}"></div>
+  </div>
+  <div class="m-row">
+    <div class="m-field"><label for="distance_km">Distance (km)</label><input id="distance_km" name="distance_km" type="number" step="0.1" inputmode="decimal" min="0" value="{{ row.distance_km if row and row.distance_km else '' }}"></div>
+    <div class="m-field"><label for="seats">Seats</label><input id="seats" name="seats" type="number" inputmode="numeric" min="0" max="200" value="{{ row.seats if row else 0 }}"></div>
+  </div>
+  <div class="m-row">
+    <div class="m-field"><label for="revenue">Revenue</label><input id="revenue" name="revenue" inputmode="decimal" value="{{ '{:.2f}'.format(row.revenue_cents / 100) if row else '0.00' }}"></div>
+    <div class="m-field"><label for="cost">Cost</label><input id="cost" name="cost" inputmode="decimal" value="{{ '{:.2f}'.format(row.cost_cents / 100) if row else '0.00' }}"></div>
+  </div>
+  <div class="m-field">
+    <label for="fuel">Fuel cost</label>
+    <input id="fuel" name="fuel" inputmode="decimal" value="{{ '{:.2f}'.format((row.fuel_cents or 0) / 100) if row else '0.00' }}">
+  </div>
+  <div class="m-field">
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      {% for s in statuses %}<option value="{{ s }}" {% if row and row.status == s %}selected{% elif not row and s == 'scheduled' %}selected{% endif %}>{{ s }}</option>{% endfor %}
+    </select>
+  </div>
+  <button class="m-btn m-btn-primary m-btn-block">{{ 'Save changes' if row else 'Create trip' }}</button>
+  <a class="m-btn m-btn-ghost m-btn-block" href="{{ url_for('mobile.trips') }}">Cancel</a>
+</form>
+
+{% if row %}
+<div class="m-statuses">
+  {% for s in statuses %}
+    {% if s != row.status %}
+    <form method="post" action="{{ url_for('mobile.trips_status', tid=row.id) }}">
+      <input type="hidden" name="status" value="{{ s }}">
+      <button class="m-btn m-btn-ghost m-btn-block">Mark as {{ s }}</button>
+    </form>
+    {% endif %}
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

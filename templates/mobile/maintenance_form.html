@@ -1,0 +1,36 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'records' %}
+{% block title %}Add maintenance - {{ g.company.name }}{% endblock %}
+{% block heading %}Add maintenance item{% endblock %}
+{% block content %}
+<form method="post" class="m-form" novalidate>
+  <div class="m-field">
+    <label for="vehicle_id">Vehicle</label>
+    <select id="vehicle_id" name="vehicle_id"><option value="">-- none --</option>
+      {% for v in vehicles %}<option value="{{ v.id }}">{{ v.plate_no }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="m-field">
+    <label for="work">Work required *</label>
+    <input id="work" name="work" required placeholder="e.g. Oil change and filter">
+  </div>
+  <div class="m-row">
+    <div class="m-field"><label for="status">Status</label>
+      <select id="status" name="status">
+        {% for s in statuses %}<option value="{{ s }}" {% if s == 'open' %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="m-field"><label for="cost">Cost</label><input id="cost" name="cost" inputmode="decimal" value="0.00"></div>
+  </div>
+  <div class="m-row">
+    <div class="m-field"><label for="date">Date</label><input id="date" name="date" type="date"></div>
+    <div class="m-field"><label for="next_due">Next due</label><input id="next_due" name="next_due" type="date"></div>
+  </div>
+  <div class="m-field">
+    <label for="notes">Notes</label>
+    <textarea id="notes" name="notes" rows="3" placeholder="Optional"></textarea>
+  </div>
+  <button class="m-btn m-btn-primary m-btn-block">Add item</button>
+  <a class="m-btn m-btn-ghost m-btn-block" href="{{ url_for('mobile.maintenance') }}">Cancel</a>
+</form>
+{% endblock %}
