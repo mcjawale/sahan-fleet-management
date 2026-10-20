@@ -1,0 +1,64 @@
+name: Deploy to PythonAnywhere
+
+# Pulls the latest code on PythonAnywhere and reloads the web app every time
+# master is updated. Requires three repository secrets (Settings -> Secrets and
+# variables -> Actions):
+#
+#   PA_API_TOKEN  - PythonAnywhere API token (Account -> API token)
+#   PA_USERNAME   - your PythonAnywhere username
+#   PA_DOMAIN     - the web app domain, e.g. mcjawale.pythonanywhere.com
+#
+# If any of these are missing the job is skipped, so the repo keeps working
+# for anyone who has not configured deployment.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check secrets are configured
+        id: check
+        run: |
+          if [ -n "${{ secrets.PA_API_TOKEN }}" ] && [ -n "${{ secrets.PA_USERNAME }}" ] && [ -n "${{ secrets.PA_DOMAIN }}" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Deployment secrets not set - skipping."
+          fi
+
+      - name: Pull latest code on PythonAnywhere
+        if: steps.check.outputs.ready == 'true'
+        env:
+          PA_API_TOKEN: ${{ secrets.PA_API_TOKEN }}
+          PA_USERNAME: ${{ secrets.PA_USERNAME }}
+        run: |
+          echo "Console id:" 
+          CONSOLE_ID=$(curl -s -X POST \
+            -H "Authorization: Token $PA_API_TOKEN" \
+            "https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/consoles/" \
+            -d "executable=bash" | python3 -c "import sys,json;print(json.load(sys.stdin).get('id',''))")
+          echo "  $CONSOLE_ID"
+          curl -s -X POST \
+            -H "Authorization: Token $PA_API_TOKEN" \
+            "https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/consoles/$CONSOLE_ID/input/" \
+            --data-urlencode "input=cd ~/sahan-fleet-management && git pull origin master\n" >/dev/null
+          sleep 8
+          echo "--- console output ---"
+          curl -s -H "Authorization: Token $PA_API_TOKEN" \
+            "https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/consoles/$CONSOLE_ID/output/"
+
+      - name: Reload the web app
+        if: steps.check.outputs.ready == 'true'
+        env:
+          PA_API_TOKEN: ${{ secrets.PA_API_TOKEN }}
+          PA_USERNAME: ${{ secrets.PA_USERNAME }}
+          PA_DOMAIN: ${{ secrets.PA_DOMAIN }}
+        run: |
+          curl -s -X POST \
+            -H "Authorization: Token $PA_API_TOKEN" \
+            "https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/webapps/$PA_DOMAIN/reload/" \
+            -w "HTTP %{http_code}\n"
