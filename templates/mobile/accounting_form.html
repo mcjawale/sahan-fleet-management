@@ -1,0 +1,61 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'accounting' %}
+{% block title %}{{ 'Edit entry' if row else 'New entry' }} - {{ g.company.name }}{% endblock %}
+{% block heading %}{{ 'Edit entry' if row else 'New entry' }}{% endblock %}
+{% block content %}
+<form method="post" class="m-form" novalidate>
+  <div class="m-seg">
+    {% for k in kinds %}
+    <label class="m-seg-opt {{ k }}">
+      <input type="radio" name="kind" value="{{ k }}" {% if (row and row.kind == k) or (not row and k == 'income') %}checked{% endif %}>
+      <span>{{ k|capitalize }}</span>
+    </label>
+    {% endfor %}
+  </div>
+
+  <div class="m-field">
+    <label for="amount">Amount *</label>
+    <input id="amount" name="amount" inputmode="decimal" value="{{ '{:.2f}'.format(row.amount_cents / 100) if row else '0.00' }}">
+  </div>
+  <div class="m-field">
+    <label for="description">Description *</label>
+    <input id="description" name="description" required value="{{ row.description if row else '' }}" placeholder="e.g. Driver salary August">
+  </div>
+  <div class="m-field">
+    <label for="category">Category</label>
+    <select id="category" name="category">
+      <optgroup label="Income">
+        {% for c in categories['income'] %}<option value="{{ c }}" {% if row and row.category == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+      </optgroup>
+      <optgroup label="Expense">
+        {% for c in categories['expense'] %}<option value="{{ c }}" {% if row and row.category == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+      </optgroup>
+    </select>
+  </div>
+  <div class="m-field">
+    <label for="date">Date</label>
+    <input id="date" name="date" type="date" value="{{ row.entry_date if row else '' }}">
+  </div>
+
+  <details class="m-details">
+    <summary>Link to vehicle (optional)</summary>
+    <div class="m-details-body">
+      <div class="m-field">
+        <label for="vehicle_id">Vehicle</label>
+        <select id="vehicle_id" name="vehicle_id"><option value="">-- none --</option>
+          {% for v in vehicles %}<option value="{{ v.id }}" {% if row and row.vehicle_id == v.id %}selected{% endif %}>{{ v.plate_no }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+  </details>
+
+  <button class="m-btn m-btn-primary m-btn-block">{{ 'Save' if row else 'Add entry' }}</button>
+  <a class="m-btn m-btn-ghost m-btn-block" href="{{ url_for('mobile.accounting') }}">Cancel</a>
+</form>
+
+{% if row %}
+<form method="post" action="{{ url_for('mobile.accounting_delete', eid=row.id) }}" onsubmit="return confirm('Delete this entry?')">
+  <button class="m-btn m-btn-danger m-btn-block">Delete entry</button>
+</form>
+{% endif %}
+{% endblock %}

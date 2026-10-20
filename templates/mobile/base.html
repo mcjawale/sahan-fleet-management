@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5">
 <meta name="theme-color" content="#1d4ed8">
-<meta name="description" content="MCJ Sahan Fleet Management System mobile app">
+<meta name="description" content="Sahan Management App mobile app">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="MCJ Sahan">
+<meta name="apple-mobile-web-app-title" content="Sahan">
 <meta name="mobile-web-app-capable" content="yes">
-<title>{% block title %}MCJ Sahan Fleet{% endblock %}</title>
+<title>{% block title %}Sahan Management App{% endblock %}</title>
 <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 <link rel="icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
@@ -58,9 +58,9 @@
       <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M5 3h8a2 2 0 0 1 2 2v7l1.5 1.5A1.5 1.5 0 0 1 17 16v3a1 1 0 0 0 2 0v-6.3a3.5 3.5 0 0 1-1-2.3V8h-1l1-3 1 3h1l-1.5 3.8V19a1 1 0 0 1-4 0v-2.6L13 15V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v7a2 2 0 0 1-2 2v-6.3a3.5 3.5 0 0 0 1 2.3V19h-9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg>
       <span>Records</span>
     </a>
-    <a class="m-tab {% if tab == 'more' %}on{% endif %}" href="{{ url_for('mobile.account') }}">
-      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4.4 0-8 2.2-8 5v3h16v-3c0-2.8-3.6-5-8-5z"/></svg>
-      <span>More</span>
+    <a class="m-tab {% if tab == 'accounting' %}on{% endif %}" href="{{ url_for('mobile.accounting') }}">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm1 4v2h12V7H6zm0 4v2h8v-2H6zm0 4v2h10v-2H6z"/></svg>
+      <span>Accounting</span>
     </a>
   </nav>
 </div>

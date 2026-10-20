@@ -1,28 +1,30 @@
 {% extends 'mobile/base.html' %}
 {% set tab = 'records' %}
-{% block title %}Add fuel entry - {{ g.company.name }}{% endblock %}
-{% block heading %}Add fuel entry{% endblock %}
+{% block title %}Add fuel - {{ g.company.name }}{% endblock %}
+{% block heading %}Add fuel{% endblock %}
 {% block content %}
 <form method="post" class="m-form" novalidate>
   <div class="m-field">
-    <label for="vehicle_id">Vehicle</label>
-    <select id="vehicle_id" name="vehicle_id"><option value="">-- none --</option>
+    <label for="vehicle_id">Vehicle *</label>
+    <select id="vehicle_id" name="vehicle_id"><option value="">-- choose --</option>
       {% for v in vehicles %}<option value="{{ v.id }}">{{ v.plate_no }}</option>{% endfor %}
     </select>
   </div>
   <div class="m-row">
-    <div class="m-field"><label for="amount">Amount</label><input id="amount" name="amount" inputmode="decimal" value="0.00"></div>
+    <div class="m-field"><label for="amount">Amount *</label><input id="amount" name="amount" inputmode="decimal" value="0.00"></div>
     <div class="m-field"><label for="quantity_l">Litres</label><input id="quantity_l" name="quantity_l" inputmode="decimal" step="0.01" placeholder="65.5"></div>
   </div>
-  <div class="m-row">
-    <div class="m-field"><label for="date">Date</label><input id="date" name="date" type="date"></div>
-    <div class="m-field"><label for="odometer">Odometer</label><input id="odometer" name="odometer" type="number" inputmode="numeric" min="0" value="0"></div>
-  </div>
-  <div class="m-field">
-    <label for="notes">Notes</label>
-    <textarea id="notes" name="notes" rows="3" placeholder="Optional"></textarea>
-  </div>
-  <button class="m-btn m-btn-primary m-btn-block">Save entry</button>
+
+  <details class="m-details">
+    <summary>More (optional)</summary>
+    <div class="m-details-body">
+      <div class="m-field"><label for="date">Date</label><input id="date" name="date" type="date"></div>
+      <div class="m-field"><label for="odometer">Odometer</label><input id="odometer" name="odometer" type="number" inputmode="numeric" min="0" value="0"></div>
+      <div class="m-field"><label for="notes">Notes</label><textarea id="notes" name="notes" rows="2" placeholder="Optional"></textarea></div>
+    </div>
+  </details>
+
+  <button class="m-btn m-btn-primary m-btn-block">Save</button>
   <a class="m-btn m-btn-ghost m-btn-block" href="{{ url_for('mobile.fuel') }}">Cancel</a>
 </form>
 {% endblock %}

@@ -78,6 +78,7 @@ def create_app():
     from .records.routes import bp as rec_bp
     from .export.routes import bp as exp_bp
     from .billing.routes import bp as bill_bp
+    from .ledger.routes import bp as ledger_bp
     from .mobile.routes import bp as mobile_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(dash_bp)
@@ -87,6 +88,7 @@ def create_app():
     app.register_blueprint(rec_bp)
     app.register_blueprint(exp_bp)
     app.register_blueprint(bill_bp)
+    app.register_blueprint(ledger_bp)
     app.register_blueprint(mobile_bp)
 
     @app.route('/sw.js')

@@ -111,7 +111,7 @@ h2 { font-size: 16px; }
 
 .m-main {
   flex: 1;
-  padding: 14px 12px calc(var(--m-tab-h) + env(safe-area-inset-bottom) + 22px);
+  padding: 12px clamp(10px, 3.5vw, 18px) calc(var(--m-tab-h) + env(safe-area-inset-bottom) + 22px);
   max-width: 720px;
   width: 100%;
   margin: 0 auto;
@@ -163,10 +163,12 @@ h2 { font-size: 16px; }
 /* ---------- KPIs ---------- */
 .m-kpis {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   margin-bottom: 14px;
 }
+.m-kpis-3 { grid-template-columns: repeat(3, 1fr); }
+.m-kpis-3 .m-kpi-val { font-size: 17px; }
 .m-kpi {
   background: var(--m-surface);
   border: 1px solid var(--m-line);
@@ -226,7 +228,7 @@ h2 { font-size: 16px; }
 /* ---------- Quick actions ---------- */
 .m-quick {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   margin-bottom: 16px;
 }
@@ -342,10 +344,75 @@ a.m-item:active { background: #f8fafc; }
   color: #334155;
   white-space: nowrap;
 }
-.m-tag.ok, .m-tag.completed, .m-tag.available { background: #dcfce7; color: var(--m-ok); }
+.m-tag.ok, .m-tag.completed, .m-tag.available, .m-tag.income { background: #dcfce7; color: var(--m-ok); }
 .m-tag.in_transit, .m-tag.in_progress, .m-tag.in_service { background: #dbeafe; color: var(--m-info); }
 .m-tag.scheduled, .m-tag.open, .m-tag.booked { background: #fef3c7; color: var(--m-warn); }
-.m-tag.cancelled, .m-tag.maintenance { background: #fee2e2; color: var(--m-err); }
+.m-tag.cancelled, .m-tag.maintenance, .m-tag.expense { background: #fee2e2; color: var(--m-err); }
+
+.m-amount.income { color: var(--m-ok); }
+.m-amount.expense { color: var(--m-err); }
+
+.m-kpi-val.income { color: var(--m-ok); }
+.m-kpi-val.expense { color: var(--m-err); }
+
+/* ---------- Accounting: month nav + income/expense toggle ---------- */
+.m-monthnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.m-monthnav-label {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--m-ink);
+}
+.m-monthnav-arrow {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--m-surface);
+  border: 1px solid var(--m-line);
+  color: var(--m-brand-dark);
+  font-size: 24px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.m-monthnav-arrow:active { background: #eff6ff; }
+
+.m-seg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.m-seg-opt { position: relative; cursor: pointer; }
+.m-seg-opt input { position: absolute; opacity: 0; pointer-events: none; }
+.m-seg-opt span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border-radius: 12px;
+  border: 1px solid var(--m-line);
+  background: var(--m-surface);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--m-muted);
+}
+.m-seg-opt.income input:checked + span {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: var(--m-ok);
+}
+.m-seg-opt.expense input:checked + span {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: var(--m-err);
+}
 
 .m-tag-btn {
   background: #fef3c7;
@@ -522,12 +589,62 @@ a.m-item:active { background: #f8fafc; }
   font-weight: 700;
 }
 
+/* ---------- Collapsible "more details" ---------- */
+.m-details {
+  background: var(--m-surface);
+  border: 1px solid var(--m-line);
+  border-radius: var(--m-radius);
+  overflow: hidden;
+}
+.m-details summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 13px 14px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--m-brand-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  user-select: none;
+}
+.m-details summary::-webkit-details-marker { display: none; }
+.m-details summary::after {
+  content: "+";
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--m-muted);
+  line-height: 1;
+}
+.m-details[open] summary::after { content: "–"; }
+.m-details[open] summary { border-bottom: 1px solid var(--m-line); }
+.m-details-body {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 14px;
+}
+
 /* ---------- Small phones ---------- */
 @media (max-width: 360px) {
   .m-kpis { grid-template-columns: repeat(2, 1fr); }
+  .m-kpis-3 { grid-template-columns: repeat(3, 1fr); }
+  .m-kpis-3 .m-kpi-val { font-size: 14px; }
   .m-quick { grid-template-columns: repeat(2, 1fr); }
   .m-row { grid-template-columns: 1fr; }
   .m-tab { font-size: 9.5px; }
+  .m-field input,
+  .m-field select,
+  .m-field textarea { padding: 11px 10px; }
+}
+
+/* ---------- Larger phones / small tablets: 4-up grids ---------- */
+@media (min-width: 480px) {
+  .m-kpis { grid-template-columns: repeat(4, 1fr); }
+  .m-kpis-3 { grid-template-columns: repeat(3, 1fr); }
+  .m-kpis-3 .m-kpi-val { font-size: 21px; }
+  .m-quick { grid-template-columns: repeat(4, 1fr); }
 }
 
 /* ---------- Desktop: centre the phone layout ---------- */
@@ -542,4 +659,16 @@ a.m-item:active { background: #f8fafc; }
     border-bottom: 0;
   }
   .m-fab { right: calc(50% - 360px + 16px); }
+}
+
+/* ---------- Landscape phones: reclaim vertical space ---------- */
+@media (max-height: 430px) and (orientation: landscape) {
+  :root { --m-tab-h: 50px; --m-top-h: 48px; }
+  .m-tab span { display: none; }
+  .m-topbar-title p { display: none; }
+}
+
+/* ---------- Very wide screens: keep readable line length ---------- */
+@media (min-width: 1100px) {
+  .m-main, .m-tabbar { max-width: 720px; }
 }

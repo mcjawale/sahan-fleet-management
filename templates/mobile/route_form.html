@@ -8,19 +8,22 @@
     <label for="name">Route name *</label>
     <input id="name" name="name" required value="{{ row.name if row else '' }}" placeholder="Nairobi - Mombasa">
   </div>
-  <div class="m-field">
-    <label for="origin">Origin</label>
-    <input id="origin" name="origin" value="{{ row.origin if row else '' }}">
+  <div class="m-row">
+    <div class="m-field"><label for="origin">From</label><input id="origin" name="origin" value="{{ row.origin if row else '' }}" placeholder="Nairobi"></div>
+    <div class="m-field"><label for="destination">To</label><input id="destination" name="destination" value="{{ row.destination if row else '' }}" placeholder="Mombasa"></div>
   </div>
-  <div class="m-field">
-    <label for="destination">Destination</label>
-    <input id="destination" name="destination" value="{{ row.destination if row else '' }}">
-  </div>
-  <div class="m-field">
-    <label for="distance_km">Distance (km)</label>
-    <input id="distance_km" name="distance_km" type="number" step="0.1" inputmode="decimal" min="0" value="{{ row.distance_km if row and row.distance_km else '' }}">
-  </div>
-  <button class="m-btn m-btn-primary m-btn-block">{{ 'Save changes' if row else 'Add route' }}</button>
+
+  <details class="m-details">
+    <summary>More (optional)</summary>
+    <div class="m-details-body">
+      <div class="m-field">
+        <label for="distance_km">Distance (km)</label>
+        <input id="distance_km" name="distance_km" type="number" step="0.1" inputmode="decimal" min="0" value="{{ row.distance_km if row and row.distance_km else '' }}">
+      </div>
+    </div>
+  </details>
+
+  <button class="m-btn m-btn-primary m-btn-block">{{ 'Save' if row else 'Add route' }}</button>
   <a class="m-btn m-btn-ghost m-btn-block" href="{{ url_for('mobile.routes') }}">Cancel</a>
 </form>
 {% endblock %}

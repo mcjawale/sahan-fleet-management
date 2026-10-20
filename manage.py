@@ -1,8 +1,8 @@
-"""Command line admin for the MCJ Sahan Fleet Management System.
+"""Command line admin for the Sahan Management App.
 
 Usage:
     python manage.py init-db
-    python manage.py seed --company "MCJ Sahan" --username mcj --password mcj12345
+    python manage.py seed --company "Sahan Management App" --username mcj --password mcj12345
     python manage.py add-user --company mcj-sahan --username dispatcher --password pass12345
     python manage.py list-users
     python manage.py reset-password --company mcj-sahan --username mcj --password newpass123
@@ -202,7 +202,7 @@ def cmd_unlock(args):
 
 
 def main():
-    p = argparse.ArgumentParser(description='MCJ Sahan Fleet admin CLI')
+    p = argparse.ArgumentParser(description='Sahan Management App admin CLI')
     sub = p.add_subparsers(dest='cmd', required=True)
 
     sub.add_parser('init-db', help='Create/upgrade the database schema').set_defaults(fn=cmd_init_db)

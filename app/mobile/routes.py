@@ -1,4 +1,4 @@
-"""Mobile (PWA) front end for the MCJ Sahan Fleet Management System.
+"""Mobile (PWA) front end for the Sahan Management App.
 
 Mounted at /m. Uses the same session cookie and the same credential check as
 the desktop site, so one company code + username + password signs in to both.
@@ -15,6 +15,11 @@ TRIP_STATUS = ('scheduled', 'in transit', 'completed', 'cancelled')
 BOOKING_STATUS = ('booked', 'cancelled', 'completed')
 MAINT_STATUS = ('open', 'in progress', 'done')
 VEHICLE_STATUS = ('available', 'in service', 'maintenance', 'retired')
+LEDGER_KINDS = ('income', 'expense')
+LEDGER_CATEGORIES = {
+    'income': ('Trip income', 'Booking fare', 'Rental', 'Other income'),
+    'expense': ('Fuel', 'Maintenance', 'Salary', 'Office', 'Insurance', 'Other expense'),
+}
 
 
 @bp.before_request
@@ -522,6 +527,150 @@ def maintenance_status(mid):
     db().commit()
     flash('Marked as %s' % new, 'ok')
     return redirect(request.referrer or url_for('mobile.maintenance'))
+
+
+# --------------------------------------------------------------------------
+# Accounting (income / expense ledger)
+# --------------------------------------------------------------------------
+
+def _month_shift(ym, delta):
+    """Shift a 'YYYY-MM' string by +/- one month."""
+    year, month = int(ym[:4]), int(ym[5:7])
+    month += delta
+    if month < 1:
+        month, year = 12, year - 1
+    elif month > 12:
+        month, year = 1, year + 1
+    return '%04d-%02d' % (year, month)
+
+
+def _month_label(ym):
+    import datetime
+    try:
+        return datetime.datetime.strptime(ym, '%Y-%m').strftime('%B %Y')
+    except ValueError:
+        return ym
+
+
+@bp.route('/accounting')
+@require_auth
+def accounting():
+    if g.company is None:
+        abort(403)
+    import datetime
+    month = (request.args.get('month') or '').strip()
+    try:
+        datetime.datetime.strptime(month, '%Y-%m')
+    except ValueError:
+        month = datetime.date.today().strftime('%Y-%m')
+    kind = (request.args.get('kind') or '').strip()
+    if kind not in LEDGER_KINDS:
+        kind = None
+
+    totals = db().execute('''SELECT
+          COALESCE(SUM(CASE WHEN kind='income'  THEN amount_cents END),0) AS income_cents,
+          COALESCE(SUM(CASE WHEN kind='expense' THEN amount_cents END),0) AS expense_cents
+          FROM ledger_entries WHERE company_id=? AND strftime('%Y-%m', entry_date)=?''',
+                          (g.company_id, month)).fetchone()
+
+    sql = '''SELECT e.*, v.plate_no FROM ledger_entries e
+             LEFT JOIN vehicles v ON e.vehicle_id=v.id
+             WHERE e.company_id=? AND strftime('%Y-%m', e.entry_date)=?'''
+    params = [g.company_id, month]
+    if kind:
+        sql += ' AND e.kind=?'
+        params.append(kind)
+    sql += ' ORDER BY e.entry_date DESC, e.id DESC LIMIT 200'
+    rows = db().execute(sql, params).fetchall()
+
+    months = db().execute('''SELECT strftime('%Y-%m', entry_date) AS ym,
+             COALESCE(SUM(CASE WHEN kind='income'  THEN amount_cents END),0) AS income_cents,
+             COALESCE(SUM(CASE WHEN kind='expense' THEN amount_cents END),0) AS expense_cents
+             FROM ledger_entries
+             WHERE company_id=? AND entry_date >= date('now','-5 months','start of month')
+             GROUP BY ym ORDER BY ym''', (g.company_id,)).fetchall()
+
+    return render_template('mobile/accounting.html',
+                           rows=rows, totals=totals, months=months,
+                           month=month, month_label=_month_label(month),
+                           prev_month=_month_shift(month, -1),
+                           next_month=_month_shift(month, 1),
+                           kind=kind, kinds=LEDGER_KINDS)
+
+
+def _accounting_form(eid=None):
+    row = owned('ledger_entries', eid) if eid is not None else None
+    vehicles = db().execute('SELECT id,plate_no FROM vehicles WHERE company_id=? ORDER BY plate_no',
+                            (g.company_id,)).fetchall()
+    if request.method == 'POST':
+        kind = request.form.get('kind')
+        if kind not in LEDGER_KINDS:
+            kind = 'income'
+        category = form_str('category', maxlen=50)
+        if category not in LEDGER_CATEGORIES[kind]:
+            category = LEDGER_CATEGORIES[kind][-1]
+        description = form_str('description', maxlen=200)
+        amount = form_money_cents('amount')
+        entry_date = form_date('date')
+        vehicle_id = _pick('vehicles', request.form.get('vehicle_id'))
+        message = None
+        if not description:
+            message = 'Add a short description'
+        elif amount <= 0:
+            message = 'Enter an amount greater than zero'
+        if message is None:
+            if row is None:
+                db().execute('''INSERT INTO ledger_entries
+                                (company_id,kind,category,description,amount_cents,entry_date,vehicle_id,created_by)
+                                VALUES (?,?,?,?,?,?,?,?)''',
+                             (g.company_id, kind, category, description, amount,
+                              entry_date, vehicle_id, g.user_id))
+                saved = 'Entry saved'
+            else:
+                db().execute('''UPDATE ledger_entries
+                                SET kind=?,category=?,description=?,amount_cents=?,entry_date=?,vehicle_id=?
+                                WHERE id=? AND company_id=?''',
+                             (kind, category, description, amount, entry_date,
+                              vehicle_id, eid, g.company_id))
+                saved = 'Entry updated'
+            db().commit()
+            if _wants_json():
+                return _flash_json(saved)
+            flash(saved, 'ok')
+            return redirect(url_for('mobile.accounting'))
+        if _wants_json():
+            return _flash_json(message, 'error')
+        flash(message, 'error')
+    return render_template('mobile/accounting_form.html', row=row, vehicles=vehicles,
+                           kinds=LEDGER_KINDS, categories=LEDGER_CATEGORIES)
+
+
+@bp.route('/accounting/new', methods=['GET', 'POST'])
+@require_auth
+def accounting_new():
+    if g.company is None:
+        abort(403)
+    return _accounting_form()
+
+
+@bp.route('/accounting/<int:eid>/edit', methods=['GET', 'POST'])
+@require_auth
+def accounting_edit(eid):
+    if g.company is None:
+        abort(403)
+    return _accounting_form(eid)
+
+
+@bp.route('/accounting/<int:eid>/delete', methods=['POST'])
+@require_auth
+def accounting_delete(eid):
+    if g.company is None:
+        abort(403)
+    owned('ledger_entries', eid)
+    db().execute('DELETE FROM ledger_entries WHERE id=? AND company_id=?', (eid, g.company_id))
+    db().commit()
+    flash('Entry deleted', 'ok')
+    return redirect(url_for('mobile.accounting'))
 
 
 # --------------------------------------------------------------------------

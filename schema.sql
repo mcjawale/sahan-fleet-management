@@ -212,6 +212,20 @@ CREATE TABLE IF NOT EXISTS maintenance_records (
 );
 CREATE INDEX IF NOT EXISTS idx_maint_company ON maintenance_records(company_id);
 
+CREATE TABLE IF NOT EXISTS ledger_entries (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL CHECK (kind IN ('income','expense')),
+  category TEXT NOT NULL DEFAULT 'Other income',
+  description TEXT NOT NULL,
+  amount_cents INTEGER NOT NULL DEFAULT 0,
+  entry_date TEXT NOT NULL DEFAULT (date('now')),
+  vehicle_id INTEGER REFERENCES vehicles(id) ON DELETE SET NULL,
+  created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_ledger_company_date ON ledger_entries(company_id, entry_date);
+
 INSERT OR IGNORE INTO plans (code,name,price_cents,trial_days,max_vehicles,max_users,max_trips_per_month,features,sort_order)
 VALUES
 ('free','Free',0,0,2,-1,-1,'{}',1),

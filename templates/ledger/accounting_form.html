@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit entry' if row else 'Add entry' }} - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>{{ 'Edit entry' if row else 'Add entry' }}</h1><p class="page-sub">{{ g.company.name }}</p></div>
+<div class="panel">
+  <form method="post" class="form-grid" novalidate>
+    <div class="field"><label>Kind</label>
+      <select name="kind">
+        {% for k in kinds %}<option value="{{ k }}" {% if (row and row.kind == k) or (not row and k == 'income') %}selected{% endif %}>{{ k|capitalize }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Amount *</label><input name="amount" inputmode="decimal" value="{{ '{:.2f}'.format(row.amount_cents / 100) if row else '0.00' }}"></div>
+    <div class="field wide"><label>Description *</label><input name="description" required value="{{ row.description if row else '' }}" placeholder="e.g. Driver salary August"></div>
+    <div class="field"><label>Category</label>
+      <select name="category">
+        <optgroup label="Income">
+          {% for c in categories['income'] %}<option value="{{ c }}" {% if row and row.category == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+        </optgroup>
+        <optgroup label="Expense">
+          {% for c in categories['expense'] %}<option value="{{ c }}" {% if row and row.category == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+        </optgroup>
+      </select>
+    </div>
+    <div class="field"><label>Date</label><input name="date" type="date" value="{{ row.entry_date if row else '' }}"></div>
+    <div class="field"><label>Vehicle</label>
+      <select name="vehicle_id"><option value="">-- none --</option>
+        {% for v in vehicles %}<option value="{{ v.id }}" {% if row and row.vehicle_id == v.id %}selected{% endif %}>{{ v.plate_no }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-accent">{{ 'Save changes' if row else 'Add entry' }}</button>
+      <a class="btn" href="{{ url_for('ledger.accounting', slug=g.company.slug) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+
+{% if row %}
+<div class="panel">
+  <form method="post" action="{{ url_for('ledger.accounting_delete', slug=g.company.slug, eid=row.id) }}">
+    <button class="btn btn-danger" type="submit" onclick="return confirm('Delete this entry?')">Delete entry</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

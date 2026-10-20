@@ -1,0 +1,60 @@
+{% extends 'mobile/base.html' %}
+{% set tab = 'accounting' %}
+{% block title %}Accounting - {{ g.company.name }}{% endblock %}
+{% block heading %}Accounting{% endblock %}
+{% block subheading %}{{ month_label }}{% endblock %}
+{% block content %}
+<a class="m-fab" href="{{ url_for('mobile.accounting_new') }}" aria-label="Add income or expense">+</a>
+
+<div class="m-monthnav">
+  <a class="m-monthnav-arrow" href="{{ url_for('mobile.accounting', month=prev_month, kind=kind or '') }}">&lsaquo;</a>
+  <span class="m-monthnav-label">{{ month_label }}</span>
+  <a class="m-monthnav-arrow" href="{{ url_for('mobile.accounting', month=next_month, kind=kind or '') }}">&rsaquo;</a>
+</div>
+
+<div class="m-kpis m-kpis-3">
+  <div class="m-kpi"><span class="m-kpi-val income">{{ '{:,.2f}'.format(totals.income_cents / 100) }}</span><span class="m-kpi-lbl">Income</span></div>
+  <div class="m-kpi"><span class="m-kpi-val expense">{{ '{:,.2f}'.format(totals.expense_cents / 100) }}</span><span class="m-kpi-lbl">Expense</span></div>
+  <div class="m-kpi"><span class="m-kpi-val">{{ '{:,.2f}'.format((totals.income_cents - totals.expense_cents) / 100) }}</span><span class="m-kpi-lbl">Balance</span></div>
+</div>
+
+<div class="m-chips">
+  <a class="m-chip {% if not kind %}on{% endif %}" href="{{ url_for('mobile.accounting', month=month) }}">All</a>
+  {% for k in kinds %}
+  <a class="m-chip {% if kind == k %}on{% endif %}" href="{{ url_for('mobile.accounting', month=month, kind=k) }}">{{ k|capitalize }}</a>
+  {% endfor %}
+</div>
+
+<div class="m-list">
+  {% for e in rows %}
+  <a class="m-item" href="{{ url_for('mobile.accounting_edit', eid=e.id) }}">
+    <div class="m-item-main">
+      <strong>{{ e.description }}</strong>
+      <small>{{ e.entry_date }} &middot; {{ e.category }}{% if e.plate_no %} &middot; {{ e.plate_no }}{% endif %}</small>
+    </div>
+    <span class="m-amount {{ e.kind }}">{% if e.kind == 'income' %}+{% else %}-{% endif %}{{ '{:,.2f}'.format(e.amount_cents / 100) }}</span>
+  </a>
+  {% else %}
+  <div class="m-empty">No {{ kind or '' }} entries in {{ month_label }}.<br><a href="{{ url_for('mobile.accounting_new') }}">Add income or expense</a></div>
+  {% endfor %}
+</div>
+
+{% if months|length > 1 %}
+<h2 class="m-h2">Last months</h2>
+<div class="m-list">
+  {% for m in months %}
+  <a class="m-item" href="{{ url_for('mobile.accounting', month=m.ym) }}">
+    <div class="m-item-main">
+      <strong>{{ m.ym }}</strong>
+      <small>In {{ '{:,.2f}'.format(m.income_cents / 100) }} &middot; Out {{ '{:,.2f}'.format(m.expense_cents / 100) }}</small>
+    </div>
+    <span class="m-amount {% if m.income_cents - m.expense_cents >= 0 %}income{% else %}expense{% endif %}">{{ '{:,.2f}'.format((m.income_cents - m.expense_cents) / 100) }}</span>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="m-subnav">
+  <a class="m-subnav-link" href="{{ url_for('mobile.account') }}">Account &rarr;</a>
+</div>
+{% endblock %}

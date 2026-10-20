@@ -17,6 +17,9 @@ instance/*.db
 # Logs
 *.log
 
+# Build / deploy artifacts
+*.zip
+
 # Editor / OS
 .idea/
 .vscode/

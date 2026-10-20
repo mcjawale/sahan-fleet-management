@@ -1,7 +1,7 @@
 {
-  "name": "MCJ Sahan Fleet Management System",
-  "short_name": "MCJ Sahan",
-  "description": "Fleet, trips, fuel and maintenance for MCJ Sahan transport operations.",
+  "name": "Sahan Management App",
+  "short_name": "Sahan",
+  "description": "Fleet, trips, fuel and maintenance for Sahan Management App transport operations.",
   "start_url": "/m/",
   "scope": "/m/",
   "display": "standalone",

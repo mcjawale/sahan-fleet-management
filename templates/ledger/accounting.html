@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Accounting - {{ g.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Accounting</h1>
+  <p class="page-sub">{{ month_label }} &middot; income &amp; expenses ledger</p>
+</div>
+
+<div class="quick-actions">
+  <a class="btn btn-accent" href="{{ url_for('ledger.accounting_new', slug=g.company.slug) }}">+ Add Entry</a>
+  <a class="btn" href="{{ url_for('ledger.accounting', slug=g.company.slug, month=prev_month) }}">&larr; Previous month</a>
+  <a class="btn" href="{{ url_for('ledger.accounting', slug=g.company.slug, month=next_month) }}">Next month &rarr;</a>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-body"><div class="kpi-label">Income</div><div class="kpi-value">{{ '{:,.2f}'.format(totals.income_cents / 100) }}</div></div></div>
+  <div class="kpi"><div class="kpi-body"><div class="kpi-label">Expense</div><div class="kpi-value">{{ '{:,.2f}'.format(totals.expense_cents / 100) }}</div></div></div>
+  <div class="kpi"><div class="kpi-body"><div class="kpi-label">Balance</div><div class="kpi-value">{{ '{:,.2f}'.format((totals.income_cents - totals.expense_cents) / 100) }}</div></div></div>
+</div>
+
+<div class="grid-2">
+  <div class="panel">
+    <div class="panel-head"><h2>Entries &middot; {{ month_label }}</h2>
+      <span>
+        <a class="btn btn-sm {% if not kind %}btn-accent{% endif %}" href="{{ url_for('ledger.accounting', slug=g.company.slug, month=month) }}">All</a>
+        {% for k in kinds %}<a class="btn btn-sm {% if kind == k %}btn-accent{% endif %}" href="{{ url_for('ledger.accounting', slug=g.company.slug, month=month, kind=k) }}">{{ k|capitalize }}</a>{% endfor %}
+      </span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Kind</th><th>Category</th><th>Description</th><th>Vehicle</th><th class="num">Amount</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for e in rows %}
+          <tr>
+            <td>{{ e.entry_date }}</td>
+            <td><span class="tag {{ e.kind }}">{{ e.kind }}</span></td>
+            <td>{{ e.category }}</td>
+            <td>{{ e.description }}</td>
+            <td>{{ e.plate_no or '-' }}</td>
+            <td class="num">{{ '{:,.2f}'.format(e.amount_cents / 100) }}</td>
+            <td class="row-actions">
+              <a class="btn btn-sm" href="{{ url_for('ledger.accounting_edit', slug=g.company.slug, eid=e.id) }}">Edit</a>
+              <form method="post" action="{{ url_for('ledger.accounting_delete', slug=g.company.slug, eid=e.id) }}" class="inline-form">
+                <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Delete this entry?')">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="7" class="empty">No {{ kind or '' }} entries in {{ month_label }}.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>By category</h2></div>
+    <div class="stat-bars">
+      {% set max_cat = (by_category[0].total_cents if by_category else 0) or 1 %}
+      {% for c in by_category %}
+      <div class="stat-bar">
+        <span class="s-name">{{ c.category }}</span>
+        <div class="track"><div class="fill {% if c.kind == 'income' %}teal{% else %}red{% endif %}" style="width: {{ (c.total_cents * 100 / max_cat)|round(1) }}%"></div></div>
+        <strong>{{ '{:,.0f}'.format(c.total_cents / 100) }}</strong>
+      </div>
+      {% else %}<p class="empty">Nothing recorded this month.</p>{% endfor %}
+    </div>
+
+    <div class="panel-head" style="margin-top:18px"><h2>Last months</h2></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Month</th><th class="num">Income</th><th class="num">Expense</th><th class="num">Balance</th></tr></thead>
+      <tbody>
+      {% for m in months %}
+        <tr>
+          <td><a href="{{ url_for('ledger.accounting', slug=g.company.slug, month=m.ym) }}">{{ m.ym }}</a></td>
+          <td class="num">{{ '{:,.2f}'.format(m.income_cents / 100) }}</td>
+          <td class="num">{{ '{:,.2f}'.format(m.expense_cents / 100) }}</td>
+          <td class="num">{{ '{:,.2f}'.format((m.income_cents - m.expense_cents) / 100) }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4" class="empty">No history yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+  </div>
+</div>
+{% endblock %}

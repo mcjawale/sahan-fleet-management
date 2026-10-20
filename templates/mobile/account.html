@@ -1,5 +1,4 @@
 {% extends 'mobile/base.html' %}
-{% set tab = 'more' %}
 {% block title %}Account - {{ g.company.name }}{% endblock %}
 {% block heading %}Account{% endblock %}
 {% block content %}
@@ -20,6 +19,7 @@
 
 <h2 class="m-h2">More</h2>
 <div class="m-list">
+  <a class="m-item" href="{{ url_for('mobile.accounting') }}"><div class="m-item-main"><strong>Accounting</strong><small>Income &amp; expenses ledger</small></div><span class="m-chev">&rsaquo;</span></a>
   <a class="m-item" href="{{ url_for('mobile.vehicles') }}"><div class="m-item-main"><strong>All vehicles</strong></div><span class="m-chev">&rsaquo;</span></a>
   <a class="m-item" href="{{ url_for('mobile.drivers') }}"><div class="m-item-main"><strong>Drivers</strong></div><span class="m-chev">&rsaquo;</span></a>
   <a class="m-item" href="{{ url_for('mobile.routes') }}"><div class="m-item-main"><strong>Routes</strong></div><span class="m-chev">&rsaquo;</span></a>
@@ -27,5 +27,5 @@
 </div>
 
 <a class="m-btn m-btn-danger m-btn-block" href="{{ url_for('mobile.logout') }}">Sign out</a>
-<p class="m-fine">MCJ Sahan Fleet Management System<br>Need help? +252 61 100 9962</p>
+<p class="m-fine">Sahan Management App<br>Need help? +252 61 100 9962</p>
 {% endblock %}
