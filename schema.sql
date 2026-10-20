@@ -226,6 +226,17 @@ CREATE TABLE IF NOT EXISTS ledger_entries (
 );
 CREATE INDEX IF NOT EXISTS idx_ledger_company_date ON ledger_entries(company_id, entry_date);
 
+CREATE TABLE IF NOT EXISTS ledger_categories (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL CHECK (kind IN ('income','expense')),
+  name TEXT NOT NULL,
+  sort_order INTEGER DEFAULT 0,
+  active INTEGER DEFAULT 1
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ledger_cat_unique ON ledger_categories(company_id, kind, name COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS idx_ledger_cat_company ON ledger_categories(company_id, kind, active);
+
 INSERT OR IGNORE INTO plans (code,name,price_cents,trial_days,max_vehicles,max_users,max_trips_per_month,features,sort_order)
 VALUES
 ('free','Free',0,0,2,-1,-1,'{}',1),

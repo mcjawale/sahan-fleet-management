@@ -190,7 +190,7 @@ def _form(slug, eid=None):
             db().commit()
             return redirect(url_for('ledger.accounting', slug=slug))
     return render_template('ledger/accounting_form.html', row=row, vehicles=_vehicles(),
-                           kinds=LEDGER_KINDS, categories=categories_map)
+                           kinds=LEDGER_KINDS, categories_map=categories_map)
 
 
 @bp.route('/accounting/<int:eid>/delete', methods=['POST'])

@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS ledger_categories (
   kind TEXT NOT NULL CHECK (kind IN ('income','expense')),
   name TEXT NOT NULL,
   sort_order INTEGER DEFAULT 0,
-  active INTEGER DEFAULT 1,
-  UNIQUE(company_id, kind, lower(name))
+  active INTEGER DEFAULT 1
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ledger_cat_unique ON ledger_categories(company_id, kind, name COLLATE NOCASE);
 CREATE INDEX IF NOT EXISTS idx_ledger_cat_company ON ledger_categories(company_id, kind, active);

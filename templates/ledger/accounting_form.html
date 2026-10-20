@@ -14,10 +14,10 @@
     <div class="field"><label>Category</label>
       <select name="category">
         <optgroup label="Income">
-          {% for c in categories['income'] %}<option value="{{ c }}" {% if row and row.category == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+          {% for c in categories_map['income'] %}<option value="{{ c }}" {% if row and row.category == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
         </optgroup>
         <optgroup label="Expense">
-          {% for c in categories['expense'] %}<option value="{{ c }}" {% if row and row.category == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+          {% for c in categories_map['expense'] %}<option value="{{ c }}" {% if row and row.category == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
         </optgroup>
       </select>
     </div>
