@@ -590,8 +590,17 @@ def accounting():
              WHERE company_id=? AND entry_date >= date('now','-5 months','start of month')
              GROUP BY ym ORDER BY ym''', (g.company_id,)).fetchall()
 
+    spend = {
+        'fuel': db().execute("SELECT COALESCE(SUM(amount_cents),0) FROM fuel_records WHERE company_id=? AND strftime('%Y-%m',date)=?",
+                             (g.company_id, month)).fetchone()[0],
+        'maint': db().execute("SELECT COALESCE(SUM(cost_cents),0) FROM maintenance_records WHERE company_id=? AND strftime('%Y-%m',date)=?",
+                              (g.company_id, month)).fetchone()[0],
+        'trip_revenue': db().execute("SELECT COALESCE(SUM(revenue_cents),0) FROM trips WHERE company_id=? AND strftime('%Y-%m',COALESCE(departure_at,created_at))=?",
+                                     (g.company_id, month)).fetchone()[0],
+    }
+
     return render_template('mobile/accounting.html',
-                           rows=rows, totals=totals, months=months,
+                           rows=rows, totals=totals, months=months, spend=spend,
                            month=month, month_label=_month_label(month),
                            prev_month=_month_shift(month, -1),
                            next_month=_month_shift(month, 1),

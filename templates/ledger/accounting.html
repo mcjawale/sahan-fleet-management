@@ -10,12 +10,17 @@
   <a class="btn btn-accent" href="{{ url_for('ledger.accounting_new', slug=g.company.slug) }}">+ Add Entry</a>
   <a class="btn" href="{{ url_for('ledger.accounting', slug=g.company.slug, month=prev_month) }}">&larr; Previous month</a>
   <a class="btn" href="{{ url_for('ledger.accounting', slug=g.company.slug, month=next_month) }}">Next month &rarr;</a>
+  <a class="btn" href="{{ url_for('fleet.vehicles', slug=g.company.slug) }}">Vehicles</a>
+  <a class="btn" href="{{ url_for('export.index', slug=g.company.slug) }}">Reports &amp; Exports</a>
 </div>
 
 <div class="kpi-row">
   <div class="kpi"><div class="kpi-body"><div class="kpi-label">Income</div><div class="kpi-value">{{ '{:,.2f}'.format(totals.income_cents / 100) }}</div></div></div>
   <div class="kpi"><div class="kpi-body"><div class="kpi-label">Expense</div><div class="kpi-value">{{ '{:,.2f}'.format(totals.expense_cents / 100) }}</div></div></div>
   <div class="kpi"><div class="kpi-body"><div class="kpi-label">Balance</div><div class="kpi-value">{{ '{:,.2f}'.format((totals.income_cents - totals.expense_cents) / 100) }}</div></div></div>
+  <div class="kpi"><div class="kpi-body"><div class="kpi-label">Fuel spend ({{ month_label }})</div><div class="kpi-value">{{ '{:,.2f}'.format(spend.fuel / 100) }}</div></div></div>
+  <div class="kpi"><div class="kpi-body"><div class="kpi-label">Maintenance spend</div><div class="kpi-value">{{ '{:,.2f}'.format(spend.maint / 100) }}</div></div></div>
+  <div class="kpi"><div class="kpi-body"><div class="kpi-label">Trip revenue / cost</div><div class="kpi-value">{{ '{:,.2f}'.format(spend.trip_revenue / 100) }}</div><div class="kpi-hint">cost {{ '{:,.2f}'.format(spend.trip_cost / 100) }}</div></div></div>
 </div>
 
 <div class="grid-2">

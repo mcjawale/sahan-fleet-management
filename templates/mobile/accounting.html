@@ -18,6 +18,17 @@
   <div class="m-kpi"><span class="m-kpi-val">{{ '{:,.2f}'.format((totals.income_cents - totals.expense_cents) / 100) }}</span><span class="m-kpi-lbl">Balance</span></div>
 </div>
 
+<h2 class="m-h2">Fleet costs &middot; {{ month_label }}</h2>
+<div class="m-card">
+  <div class="m-kv"><span>Fuel spend</span><strong>{{ '{:,.2f}'.format(spend.fuel / 100) }}</strong></div>
+  <div class="m-kv"><span>Maintenance spend</span><strong>{{ '{:,.2f}'.format(spend.maint / 100) }}</strong></div>
+  <div class="m-kv"><span>Trip revenue</span><strong>{{ '{:,.2f}'.format(spend.trip_revenue / 100) }}</strong></div>
+</div>
+<div class="m-quick">
+  <a class="m-qbtn" href="{{ url_for('mobile.vehicles') }}"><span>Vehicles</span><small>Fleet list</small></a>
+  <a class="m-qbtn" href="{{ url_for('mobile.accounting_new') }}"><span>Entry</span><small>Add entry</small></a>
+</div>
+
 <div class="m-chips">
   <a class="m-chip {% if not kind %}on{% endif %}" href="{{ url_for('mobile.accounting', month=month) }}">All</a>
   {% for k in kinds %}

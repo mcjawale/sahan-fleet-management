@@ -76,8 +76,20 @@ def accounting(slug):
              GROUP BY kind, category ORDER BY total_cents DESC''',
                                (g.company_id, month)).fetchall()
 
+    spend = {
+        'fuel': db().execute("SELECT COALESCE(SUM(amount_cents),0) FROM fuel_records WHERE company_id=? AND strftime('%Y-%m',date)=?",
+                             (g.company_id, month)).fetchone()[0],
+        'maint': db().execute("SELECT COALESCE(SUM(cost_cents),0) FROM maintenance_records WHERE company_id=? AND strftime('%Y-%m',date)=?",
+                              (g.company_id, month)).fetchone()[0],
+        'trip_cost': db().execute("SELECT COALESCE(SUM(cost_cents),0) FROM trips WHERE company_id=? AND strftime('%Y-%m',COALESCE(departure_at,created_at))=?",
+                                  (g.company_id, month)).fetchone()[0],
+        'trip_revenue': db().execute("SELECT COALESCE(SUM(revenue_cents),0) FROM trips WHERE company_id=? AND strftime('%Y-%m',COALESCE(departure_at,created_at))=?",
+                                     (g.company_id, month)).fetchone()[0],
+    }
+
     return render_template('ledger/accounting.html',
                            rows=rows, totals=totals, months=months, by_category=by_category,
+                           spend=spend,
                            month=month, month_label=_month_label(month),
                            prev_month=_month_shift(month, -1),
                            next_month=_month_shift(month, 1),
