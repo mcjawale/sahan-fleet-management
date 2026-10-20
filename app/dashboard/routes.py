@@ -37,8 +37,14 @@ def index(slug):
                                  LEFT JOIN vehicles v ON m.vehicle_id=v.id WHERE m.company_id=? AND m.status!='done'
                                  ORDER BY m.id DESC LIMIT 5''', (cid,)).fetchall()
     comp = db.execute("SELECT COALESCE(v.status,'available') as st, COUNT(*) as c FROM vehicles v WHERE v.company_id=? GROUP BY st", (cid,)).fetchall()
+    ledger = db.execute('''SELECT
+          COALESCE(SUM(CASE WHEN kind='income'  THEN amount_cents END),0) AS income_cents,
+          COALESCE(SUM(CASE WHEN kind='expense' THEN amount_cents END),0) AS expense_cents
+          FROM ledger_entries WHERE company_id=? AND strftime('%Y-%m', entry_date)=strftime('%Y-%m','now')''',
+                        (cid,)).fetchone()
     return render_template('dashboard/index.html',
         fleet=fleet, active_trips=active_trips, pending_b=pending_b,
         profit_cents=profit_cents, rev_cents=rev['s'] or 0, cost_cents=rev['c'] or 0,
         fuel_mtd=fuel_mtd, drivers_ready=drivers_ready, maint_open=maint_open,
+        ledger_income=ledger['income_cents'], ledger_expense=ledger['expense_cents'],
         recent=recent, upcoming=upcoming, fuel_top=fuel_top, maint_alerts=maint_alerts, comp=comp)
