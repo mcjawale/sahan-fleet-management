@@ -1,0 +1,19 @@
+{% extends 'mobile/base.html' %}
+{% block title %}Edit profile - {{ g.company.name }}{% endblock %}
+{% block heading %}Edit profile{% endblock %}
+{% block content %}
+<form method="post" class="m-form" novalidate>
+  <div class="m-field">
+    <label for="full_name">Full name</label>
+    <input id="full_name" name="full_name" value="{{ g.user.full_name or '' }}" placeholder="Your name">
+  </div>
+  <div class="m-field">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" inputmode="email" value="{{ g.user.email or '' }}" placeholder="you@example.com" autocapitalize="none">
+  </div>
+  <div class="m-kv"><span>Username</span><strong>{{ g.user.username }}</strong></div>
+  <div class="m-kv"><span>Role</span><strong>{{ g.user.role }}</strong></div>
+  <button class="m-btn m-btn-primary m-btn-block">Save profile</button>
+  <a class="m-btn m-btn-ghost m-btn-block" href="{{ url_for('mobile.account') }}">Cancel</a>
+</form>
+{% endblock %}

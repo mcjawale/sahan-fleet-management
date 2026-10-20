@@ -701,3 +701,68 @@ def account():
         'trips': db().execute('SELECT COUNT(*) FROM trips WHERE company_id=?', (g.company_id,)).fetchone()[0],
     }
     return render_template('mobile/account.html', counts=counts)
+
+
+@bp.route('/account/profile', methods=['GET', 'POST'])
+@require_auth
+def account_profile():
+    if g.company is None:
+        abort(403)
+    from app.auth.routes import EMAIL_RE
+    if request.method == 'POST':
+        full_name = form_str('full_name', maxlen=120)
+        email = form_str('email', maxlen=120)
+        message = category = None
+        if email and not EMAIL_RE.match(email):
+            message, category = 'Enter a valid email address', 'error'
+        else:
+            clash = db().execute('SELECT id FROM users WHERE lower(email)=lower(?) AND id!=?',
+                                 (email, g.user_id)).fetchone() if email else None
+            if clash:
+                message, category = 'That email is already used by another account', 'error'
+            else:
+                db().execute('UPDATE users SET full_name=?, email=? WHERE id=?',
+                             (full_name or None, email or None, g.user_id))
+                db().commit()
+                message = 'Profile updated'
+                if _wants_json():
+                    return _flash_json(message)
+                flash(message, 'ok')
+                return redirect(url_for('mobile.account'))
+        if _wants_json():
+            return _flash_json(message, category)
+        flash(message, category)
+    return render_template('mobile/account_profile.html')
+
+
+@bp.route('/account/password', methods=['GET', 'POST'])
+@require_auth
+def account_password():
+    if g.company is None:
+        abort(403)
+    from werkzeug.security import check_password_hash, generate_password_hash
+    from app.auth.routes import MIN_PASSWORD
+    if request.method == 'POST':
+        current = request.form.get('current_password', '')
+        pw1 = request.form.get('password1', '')
+        pw2 = request.form.get('password2', '')
+        row = db().execute('SELECT password_hash FROM users WHERE id=?', (g.user_id,)).fetchone()
+        message = None
+        if not row or not check_password_hash(row['password_hash'], current):
+            message = 'Your current password is incorrect'
+        elif len(pw1) < MIN_PASSWORD:
+            message = 'Password must be at least %d characters' % MIN_PASSWORD
+        elif pw1 != pw2:
+            message = 'New passwords do not match'
+        if message is None:
+            db().execute('''UPDATE users SET password_hash=?, failed_attempts=0, locked_until=NULL
+                            WHERE id=?''', (generate_password_hash(pw1), g.user_id))
+            db().commit()
+            if _wants_json():
+                return _flash_json('Password changed')
+            flash('Password changed', 'ok')
+            return redirect(url_for('mobile.account'))
+        if _wants_json():
+            return _flash_json(message, 'error')
+        flash(message, 'error')
+    return render_template('mobile/account_password.html')

@@ -38,7 +38,7 @@
         {% for e in rows %}
           <tr>
             <td>{{ e.entry_date }}</td>
-            <td><span class="tag {{ e.kind }}">{{ e.kind }}</span></td>
+            <td><span class="badge {% if e.kind == 'income' %}completed{% else %}maintenance{% endif %}">{{ e.kind }}</span></td>
             <td>{{ e.category }}</td>
             <td>{{ e.description }}</td>
             <td>{{ e.plate_no or '-' }}</td>

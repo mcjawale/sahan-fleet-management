@@ -2,9 +2,16 @@
 {% block title %}Account - {{ g.company.name }}{% endblock %}
 {% block heading %}Account{% endblock %}
 {% block content %}
+<h2 class="m-h2">Profile</h2>
+<div class="m-list">
+  <a class="m-item" href="{{ url_for('mobile.account_profile') }}"><div class="m-item-main"><strong>Edit profile</strong><small>Name &amp; email</small></div><span class="m-chev">&rsaquo;</span></a>
+  <a class="m-item" href="{{ url_for('mobile.account_password') }}"><div class="m-item-main"><strong>Change password</strong></div><span class="m-chev">&rsaquo;</span></a>
+</div>
+
 <div class="m-card">
   <div class="m-kv"><span>Signed in as</span><strong>{{ g.user.username }}</strong></div>
   <div class="m-kv"><span>Name</span><strong>{{ g.user.full_name or '-' }}</strong></div>
+  <div class="m-kv"><span>Email</span><strong>{{ g.user.email or '-' }}</strong></div>
   <div class="m-kv"><span>Role</span><strong>{{ g.user.role }}</strong></div>
   <div class="m-kv"><span>Company</span><strong>{{ g.company.name }}</strong></div>
   <div class="m-kv"><span>Company code</span><strong>{{ g.company.slug }}</strong></div>

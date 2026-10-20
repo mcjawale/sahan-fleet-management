@@ -241,6 +241,7 @@ a:hover { text-decoration: underline; }
 .stat-bar .fill.good { background: var(--green); }
 .stat-bar .fill.warn { background: var(--amber); }
 .stat-bar .fill.info { background: var(--blue); }
+.stat-bar .fill.red { background: var(--err); }
 
 /* ---------- Forms ---------- */
 input[type="text"], input[type="password"], input[type="number"], input[type="date"],
