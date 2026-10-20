@@ -18,6 +18,13 @@
   <div class="m-kpi"><span class="m-kpi-val">{{ '{:,.2f}'.format((totals.income_cents - totals.expense_cents) / 100) }}</span><span class="m-kpi-lbl">Balance</span></div>
 </div>
 
+<div class="m-card">
+  <div class="m-kv"><span>Cash in (Credit)</span><strong class="income">{{ '{:,.2f}'.format(totals.income_cents / 100) }}</strong></div>
+  <div class="m-kv"><span>Cash out (Debit)</span><strong class="expense">{{ '{:,.2f}'.format(totals.expense_cents / 100) }}</strong></div>
+  <div class="m-kv"><span>Grand total</span><strong>{{ '{:,.2f}'.format(grand.grand_cents / 100) }}</strong></div>
+  <div class="m-kv"><span>Balance (in &minus; out)</span><strong>{{ '{:,.2f}'.format((totals.income_cents - totals.expense_cents) / 100) }}</strong></div>
+</div>
+
 <h2 class="m-h2">Fleet costs &middot; {{ month_label }}</h2>
 <div class="m-card">
   <div class="m-kv"><span>Fuel spend</span><strong>{{ '{:,.2f}'.format(spend.fuel / 100) }}</strong></div>

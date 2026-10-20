@@ -76,6 +76,11 @@ def accounting(slug):
              GROUP BY kind, category ORDER BY total_cents DESC''',
                                (g.company_id, month)).fetchall()
 
+    grand = db().execute('''SELECT COALESCE(SUM(amount_cents),0) AS grand_cents,
+             COUNT(*) AS n FROM ledger_entries
+             WHERE company_id=? AND strftime('%Y-%m', entry_date)=?''',
+                         (g.company_id, month)).fetchone()
+
     spend = {
         'fuel': db().execute("SELECT COALESCE(SUM(amount_cents),0) FROM fuel_records WHERE company_id=? AND strftime('%Y-%m',date)=?",
                              (g.company_id, month)).fetchone()[0],
@@ -89,7 +94,7 @@ def accounting(slug):
 
     return render_template('ledger/accounting.html',
                            rows=rows, totals=totals, months=months, by_category=by_category,
-                           spend=spend,
+                           spend=spend, grand=grand,
                            month=month, month_label=_month_label(month),
                            prev_month=_month_shift(month, -1),
                            next_month=_month_shift(month, 1),

@@ -599,8 +599,12 @@ def accounting():
                                      (g.company_id, month)).fetchone()[0],
     }
 
+    grand = db().execute('''SELECT COALESCE(SUM(amount_cents),0) AS grand_cents, COUNT(*) AS n
+             FROM ledger_entries WHERE company_id=? AND strftime('%Y-%m', entry_date)=?''',
+                         (g.company_id, month)).fetchone()
+
     return render_template('mobile/accounting.html',
-                           rows=rows, totals=totals, months=months, spend=spend,
+                           rows=rows, totals=totals, months=months, spend=spend, grand=grand,
                            month=month, month_label=_month_label(month),
                            prev_month=_month_shift(month, -1),
                            next_month=_month_shift(month, 1),
