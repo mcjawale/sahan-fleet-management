@@ -33,6 +33,7 @@
 </div>
 <div class="m-quick">
   <a class="m-qbtn" href="{{ url_for('mobile.vehicles') }}"><span>Vehicles</span><small>Fleet list</small></a>
+  <a class="m-qbtn" href="{{ url_for('packages.index', slug=g.company.slug) }}"><span>Packages</span><small>Ledger</small></a>
   <a class="m-qbtn" href="{{ url_for('mobile.accounting_new') }}"><span>Entry</span><small>Add entry</small></a>
 </div>
 

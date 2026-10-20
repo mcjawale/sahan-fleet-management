@@ -6,10 +6,48 @@ bp = Blueprint('ledger', __name__, url_prefix='/app/<slug>')
 guard(bp)
 
 LEDGER_KINDS = ('income', 'expense')
-LEDGER_CATEGORIES = {
-    'income': ('Trip income', 'Booking fare', 'Rental', 'Other income'),
-    'expense': ('Fuel', 'Maintenance', 'Salary', 'Office', 'Insurance', 'Other expense'),
+
+DEFAULT_CATEGORIES = {
+    'income': ['Trip income', 'Booking fare', 'Rental', 'Other income'],
+    'expense': ['Fuel', 'Maintenance', 'Salary', 'Office', 'Insurance', 'Other expense'],
 }
+
+
+def _ensure_categories(company_id):
+    conn = db()
+    for kind, names in DEFAULT_CATEGORIES.items():
+        for idx, name in enumerate(names):
+            try:
+                conn.execute('''INSERT OR IGNORE INTO ledger_categories
+                                (company_id, kind, name, sort_order, active)
+                                VALUES (?,?,?,?,1)''',
+                             (company_id, kind, name, idx))
+            except Exception:
+                pass
+    conn.commit()
+
+
+def _get_categories(company_id, kind=None):
+    conn = db()
+    _ensure_categories(company_id)
+    sql = 'SELECT name FROM ledger_categories WHERE company_id=? AND active=1'
+    params = [company_id]
+    if kind in LEDGER_KINDS:
+        sql += ' AND kind=?'
+        params.append(kind)
+    sql += ' ORDER BY sort_order ASC, id ASC'
+    rows = conn.execute(sql, params).fetchall()
+    if not rows:
+        return DEFAULT_CATEGORIES.get(kind) if kind in LEDGER_KINDS else []
+    return [r['name'] for r in rows]
+
+
+def get_categories_map(company_id):
+    _ensure_categories(company_id)
+    res = {}
+    for kind in LEDGER_KINDS:
+        res[kind] = _get_categories(company_id, kind)
+    return res
 
 
 def _month_shift(ym, delta):
@@ -92,13 +130,15 @@ def accounting(slug):
                                      (g.company_id, month)).fetchone()[0],
     }
 
+    categories_map = get_categories_map(g.company_id)
     return render_template('ledger/accounting.html',
                            rows=rows, totals=totals, months=months, by_category=by_category,
                            spend=spend, grand=grand,
                            month=month, month_label=_month_label(month),
                            prev_month=_month_shift(month, -1),
                            next_month=_month_shift(month, 1),
-                           kind=kind, kinds=LEDGER_KINDS)
+                           kind=kind, kinds=LEDGER_KINDS,
+                           categories_map=categories_map)
 
 
 @bp.route('/accounting/new', methods=['GET', 'POST'])
@@ -113,13 +153,17 @@ def accounting_edit(slug, eid):
 
 def _form(slug, eid=None):
     row = owned('ledger_entries', eid) if eid is not None else None
+    categories_map = get_categories_map(g.company_id)
     if request.method == 'POST':
         kind = request.form.get('kind')
         if kind not in LEDGER_KINDS:
             kind = 'income'
         category = form_str('category', maxlen=50)
-        if category not in LEDGER_CATEGORIES[kind]:
-            category = LEDGER_CATEGORIES[kind][-1]
+        allowed = categories_map.get(kind) or []
+        if category not in allowed and allowed:
+            category = allowed[-1]
+        elif not allowed and kind in DEFAULT_CATEGORIES:
+            category = DEFAULT_CATEGORIES[kind][-1]
         description = form_str('description', maxlen=200)
         amount = form_money_cents('amount')
         entry_date = form_date('date')
@@ -146,7 +190,7 @@ def _form(slug, eid=None):
             db().commit()
             return redirect(url_for('ledger.accounting', slug=slug))
     return render_template('ledger/accounting_form.html', row=row, vehicles=_vehicles(),
-                           kinds=LEDGER_KINDS, categories=LEDGER_CATEGORIES)
+                           kinds=LEDGER_KINDS, categories=categories_map)
 
 
 @bp.route('/accounting/<int:eid>/delete', methods=['POST'])
